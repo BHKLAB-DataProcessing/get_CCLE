@@ -301,8 +301,8 @@ getCCLEP <-
     celline.ccle <- cbind(celline.ccle, "CCLE_rnaseq.cellid" = curationCell[rownames(celline.ccle), "CCLE_rnaseq.cellid"])
     tt <- as.data.frame(matrix(NA, ncol=ncol(celline.ccle), nrow=length(which(!(rownames(curationCell) %in% rownames(celline.ccle))))), stringsAsFactors=FALSE)
     colnames(tt) <- colnames(celline.ccle)
-    tt[ , "CCLE_rnaseq.cellid"] <- curationCell[which(!(rownames(curationCell) %in% rownames(celline.ccle))), "CCLE_rnaseq.cellid"]
-    rownames(tt) <- rownames(curationCell)[match(tt[ , "CCLE_rnaseq.cellid"], curationCell[ , "CCLE_rnaseq.cellid"])]
+    tt[ , "CCLE_rnaseq.cellid"] <- rownames(curationCell)[which(!rownames(curationCell) %in% rownames(celline.ccle) )]
+    rownames(tt) <- rownames(curationCell)[match(tt[ , "CCLE_rnaseq.cellid"], curationCell[ , "unique.cellid"])]
     celline.ccle <- rbind(celline.ccle,tt)
     
     ##update sensitivity info cellid to be unique.cellid
