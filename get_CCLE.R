@@ -268,7 +268,7 @@ getCCLEP <-
     
     profiles <- cbind(profiles, "amax_recomputed"= Amax)    
     
-    
+    print("Profiles done")
     ### Temporary solution while we wait for the release of PharmacoDb!!!
     
     druginfo <- cbind(druginfo, "drug.name"= druginfo[ , "Compound..code.or.generic.name."])
@@ -284,11 +284,13 @@ getCCLEP <-
     rownames(curationTissue) <- curationCell[ , "unique.cellid"]
     rownames(curationCell) <- curationCell[ , "unique.cellid"]
     
+    print("Curation Cell Done")
     drug_all <- read.csv("/pfs/downAnnotations/drugs_with_ids.csv", na.strings=c("", " ", "NA"))
     curationDrug <- drug_all[which(!is.na(drug_all[ , "CCLE.drugid"])),]
     curationDrug <- curationDrug[ , c("unique.drugid", "CCLE.drugid")]
     rownames(curationDrug) <- curationDrug[ , "unique.drugid"]
     
+    print("Curation Drug Done")
     curationDrug[which(curationDrug[ , "CCLE.drugid"]=="PD-0332991 "), "CCLE.drugid"] <- "PD-0332991"
     
     #change cell slot rownames to unique ids
