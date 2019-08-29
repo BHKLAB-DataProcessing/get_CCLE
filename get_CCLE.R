@@ -59,7 +59,7 @@ getCCLEP <-
     druginfo2 <- data.frame(matrix(NA, nrow=length(dix), ncol=ncol(druginfo), dimnames=list(dix, colnames(druginfo))), check.names=FALSE)
     newlev <- sapply(druginfo, levels)
     newlev$drugid <- dix
-    druginfo2 <- setcolclass.df(df=druginfo2, colclass=sapply(druginfo, class), factor.levels=newlev)
+    druginfo2 <- genefu::setcolclass.df(df=druginfo2, colclass=sapply(druginfo, class), factor.levels=newlev)
     druginfo2[match(as.character(druginfo[ , "drugid"]), dix), colnames(druginfo)] <- druginfo
     druginfo2[ , "drugid"] <- newlev$drugid
     druginfo <- druginfo2
@@ -328,5 +328,6 @@ getCCLEP <-
     }
 
 library(PharmacoGx)
+library(genefu)
 
 getCCLEP(nthread=1, verbose=FALSE)
