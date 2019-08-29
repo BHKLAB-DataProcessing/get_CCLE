@@ -294,6 +294,7 @@ getCCLEP <-
     curationDrug[which(curationDrug[ , "CCLE.drugid"]=="PD-0332991 "), "CCLE.drugid"] <- "PD-0332991"
     
     #change cell slot rownames to unique ids
+    celline.ccle <- celline.ccle[celline.ccle$cellid %in% curationCell$CCLE.cellid, ]
     rownames(celline.ccle) <- rownames(curationCell)[match(celline.ccle[ , "cellid"], curationCell[ , "CCLE.cellid"])]
     celline.ccle[ , "cellid"] <- rownames(celline.ccle)
     #integrate cell slot with all the extra rnaseq cells
@@ -312,11 +313,11 @@ getCCLEP <-
     ##update drugid to be unique dugid
     rownames(curationDrug) <- curationDrug[ , "unique.drugid"]
     sensitivityInfo[ , "drugid"] <- curationDrug[match(gsub("drugid_", "",sensitivityInfo[ , "drugid"]), curationDrug[ , "CCLE.drugid"]), "unique.drugid"]
+    druginfo <- druginfo[druginfo$drugid %in% curationDrug$CCLE.drugid, ]
     rownames(druginfo) <- curationDrug[match(gsub("drugid_", "",rownames(druginfo)), curationDrug[ , "CCLE.drugid"]), "unique.drugid"]
     
     ##update tissueid to be unique tissueid
     celline.ccle[ , "tissueid"] <- curationTissue[rownames(celline.ccle), "unique.tissueid"]
-
 
     load("/pfs/downloadcclemolec/CCLE_MolecProfiles.RData")
     
