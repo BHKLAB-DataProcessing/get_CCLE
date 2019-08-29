@@ -312,9 +312,11 @@ getCCLEP <-
     ###!!!!!!!!!!!!!!!!!!!!!!!
     ##update drugid to be unique dugid
     rownames(curationDrug) <- curationDrug[ , "unique.drugid"]
+    druginfo$drug.name[which(druginfo$drug.name =="PD-0332991 ")] <- "PD-0332991"
     sensitivityInfo[ , "drugid"] <- curationDrug[match(gsub("drugid_", "",sensitivityInfo[ , "drugid"]), curationDrug[ , "CCLE.drugid"]), "unique.drugid"]
-    druginfo <- druginfo[druginfo$drugid %in% curationDrug$CCLE.drugid, ]
-    rownames(druginfo) <- curationDrug[match(gsub("drugid_", "",rownames(druginfo)), curationDrug[ , "CCLE.drugid"]), "unique.drugid"]
+    druginfo <- druginfo[druginfo$drug.name %in% curationDrug$CCLE.drugid, ]
+    rownames(druginfo) <- curationDrug$unique.drugid[match(druginfo$drug.name, curationDrug$CCLE.drugid)]
+    
     
     ##update tissueid to be unique tissueid
     celline.ccle[ , "tissueid"] <- curationTissue[rownames(celline.ccle), "unique.tissueid"]
