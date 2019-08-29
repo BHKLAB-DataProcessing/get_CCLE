@@ -321,7 +321,16 @@ getCCLEP <-
 
     load("/pfs/downloadcclemolec/CCLE_MolecProfiles.RData")
     
-    CCLE <- PharmacoSet(molecularProfiles=list(molecular_profiles), name="CCLE", cell=celline.ccle, drug=druginfo, sensitivityInfo=sensitivityInfo, sensitivityRaw=raw.sensitivity, sensitivityProfiles=profiles, sensitivityN=NULL,  curationCell=curationCell, curationDrug=curationDrug, curationTissue=curationTissue, datasetType="sensitivity")
+    z <- list()
+
+    z <- c(z,c(
+  "rna"=molecular_profiles$rna,
+  "rnaseq"=molecular_profiles$rnaseq,
+  "mutation"=molecular_profiles$mutation,
+  "cnv"=molecular_profiles$cnv)
+  )
+    
+    CCLE <- PharmacoSet(molecularProfiles=z, name="CCLE", cell=celline.ccle, drug=druginfo, sensitivityInfo=sensitivityInfo, sensitivityRaw=raw.sensitivity, sensitivityProfiles=profiles, sensitivityN=NULL,  curationCell=curationCell, curationDrug=curationDrug, curationTissue=curationTissue, datasetType="sensitivity")
 
     save(CCLE, file="/pfs/out/CCLE.RData")
     
