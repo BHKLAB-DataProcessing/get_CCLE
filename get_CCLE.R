@@ -3,9 +3,8 @@ getCCLEP <-
     verbose=FALSE,
     nthread=1) {
     
-    options(stringsAsFactors=FALSE)
+        options(stringsAsFactors = FALSE)
     badchars <- "[\xb5]|[]|[ ,]|[;]|[:]|[-]|[+]|[*]|[%]|[$]|[#]|[{]|[}]|[[]|[]]|[|]|[\\^]|[/]|[\\]|[.]|[_]|[ ]"
-    
     ## drug information
     message("Read drug information")
     druginfo <- read.csv("/pfs/getCCLE/CCLE_NP24.2009_profiling_2012.02.20.csv", stringsAsFactors=FALSE)
@@ -16,7 +15,7 @@ getCCLEP <-
     druginfo[druginfo[ , "Compound..code.or.generic.name."] == "Panobinostat\xa0\xa0", "Compound..code.or.generic.name."] <- "Panobinostat"
     #druginfo[druginfo[ , "Compound..code.or.generic.name."] == "PF-2341066", "Compound..code.or.generic.name."] <- "Crizotinib"
     druginfo[druginfo[ , "Compound..code.or.generic.name."] == "PD-0332991 ", "Compound"] <- "PD-0332991"
-
+    
     ##########################################################################
     
     
@@ -26,15 +25,15 @@ getCCLEP <-
     ## profiles for the drugs
     message("Read drug sensitivity measurements")
     ## drug sensitivity data from the addendum in Nature
-   
-
-#      drugpheno <- gdata::read.xls(xls=file.path(path.drug, "ccle_drug_pheno_file.xls"), sheet=12)
-      drugpheno <- read.csv("/pfs/getCCLE/CCLE_NP24.2009_Drug_data_2015.02.24.csv")
-      drugpheno[drugpheno == "" | drugpheno == " "] <- NA
-      drugpheno[drugpheno[ , "Compound"]=="ZD-6474", "Compound"] <- "Vandetanib"
-      drugpheno[drugpheno[ , "Compound"]=="PF2341066", "Compound"] <- "PF-2341066"
-
-        
+    
+    
+    #      drugpheno <- gdata::read.xls(xls=file.path(path.drug, "ccle_drug_pheno_file.xls"), sheet=12)
+    drugpheno <- read.csv("/pfs/getCCLE/CCLE_NP24.2009_Drug_data_2015.02.24.csv")
+    drugpheno[drugpheno == "" | drugpheno == " "] <- NA
+    drugpheno[drugpheno[ , "Compound"]=="ZD-6474", "Compound"] <- "Vandetanib"
+    drugpheno[drugpheno[ , "Compound"]=="PF2341066", "Compound"] <- "PF-2341066"
+    
+    
     
     drugpheno <- data.frame(drugpheno, "drugid"=paste("drugid", as.character(drugpheno[ , "Compound"]), sep="_"), "cellid"=as.character(drugpheno[ , "Primary.Cell.Line.Name"]), check.names=FALSE)
     
@@ -59,7 +58,7 @@ getCCLEP <-
     druginfo2 <- data.frame(matrix(NA, nrow=length(dix), ncol=ncol(druginfo), dimnames=list(dix, colnames(druginfo))), check.names=FALSE)
     newlev <- sapply(druginfo, levels)
     newlev$drugid <- dix
-    druginfo2 <- genefu::setcolclass.df(df=druginfo2, colclass=sapply(druginfo, class), factor.levels=newlev)
+    druginfo2 <- setcolclass.df(df=druginfo2, colclass=sapply(druginfo, class), factor.levels=newlev)
     druginfo2[match(as.character(druginfo[ , "drugid"]), dix), colnames(druginfo)] <- druginfo
     druginfo2[ , "drugid"] <- newlev$drugid
     druginfo <- druginfo2
@@ -68,7 +67,7 @@ getCCLEP <-
     ## IC50
     drugphenot <- matrix(NA, nrow=length(celln), ncol=length(dix), dimnames=list(as.character(celln), dix))
     for(i in 1:length(celln)) {
-      tt <- as.numeric(drugpheno[drugpheno[ , "cellid"] == celln[i], "IC50..uM.norm"])
+      tt <- as.numeric(drugpheno[drugpheno[ , "cellid"] == celln[i], "IC50..uM."])
       names(tt) <- as.character(drugpheno[drugpheno[ , "cellid"] == celln[i] , "drugid"])
       drugphenot[celln[i],names(tt)] <- tt
     }
@@ -77,7 +76,7 @@ getCCLEP <-
     ## EC50..uM.
     drugphenot <- matrix(NA, nrow=length(celln), ncol=length(dix), dimnames=list(as.character(celln), dix))
     for(i in 1:length(celln)) {
-      tt <- as.numeric(drugpheno[drugpheno[ , "cellid"] == celln[i] , "EC50..uM.norm"])
+      tt <- as.numeric(drugpheno[drugpheno[ , "cellid"] == celln[i] , "EC50..uM."])
       names(tt) <- as.character(drugpheno[drugpheno[ , "cellid"] == celln[i] , "drugid"])
       drugphenot[celln[i],names(tt)] <- tt
     }
@@ -86,7 +85,7 @@ getCCLEP <-
     ## Amax
     drugphenot <- matrix(NA, nrow=length(celln), ncol=length(dix), dimnames=list(as.character(celln), dix))
     for(i in 1:length(celln)) {
-      tt <- as.numeric(drugpheno[drugpheno[ , "cellid"] == celln[i] , "Amax.norm"])
+      tt <- as.numeric(drugpheno[drugpheno[ , "cellid"] == celln[i] , "Amax"])
       names(tt) <- as.character(drugpheno[drugpheno[ , "cellid"] == celln[i] , "drugid"])
       drugphenot[celln[i],names(tt)] <- tt
     }
@@ -95,7 +94,7 @@ getCCLEP <-
     ## ActArea
     drugphenot <- matrix(NA, nrow=length(celln), ncol=length(dix), dimnames=list(as.character(celln), dix))
     for(i in 1:length(celln)) {
-      tt <- as.numeric(drugpheno[drugpheno[ , "cellid"] == celln[i] , "ActArea.norm"])
+      tt <- as.numeric(drugpheno[drugpheno[ , "cellid"] == celln[i] , "ActArea"])
       names(tt) <- as.character(drugpheno[drugpheno[ , "cellid"] == celln[i] , "drugid"])
       drugphenot[celln[i],names(tt)] <- tt
     }
@@ -113,7 +112,7 @@ getCCLEP <-
     ## Activity.Data..median
     drugphenot <- matrix(NA, nrow=length(celln), ncol=length(dix), dimnames=list(as.character(celln), dix))
     for(i in 1:length(celln)) {
-      tt <- drugpheno[drugpheno[ , "cellid"] == celln[i] , "Activity.Data.norm"]
+      tt <- drugpheno[drugpheno[ , "cellid"] == celln[i] , "Activity.Data..median."]
       names(tt) <- as.character(drugpheno[drugpheno[ , "cellid"] == celln[i] , "drugid"])
       drugphenot[celln[i],names(tt)] <- tt
     }
@@ -122,16 +121,16 @@ getCCLEP <-
     ## Activity.SD
     drugphenot <- matrix(NA, nrow=length(celln), ncol=length(dix), dimnames=list(as.character(celln), dix))
     for(i in 1:length(celln)) {
-      tt <- drugpheno[drugpheno[ , "cellid"] == celln[i] , "Activity.SD.norm"]
+      tt <- drugpheno[drugpheno[ , "cellid"] == celln[i] , "Activity.SD"]
       names(tt) <- as.character(drugpheno[drugpheno[ , "cellid"] == celln[i] , "drugid"])
       drugphenot[celln[i],names(tt)] <- tt
     }
-    colnames(drugphenot) <- paste(colnames(drugphenot), "ActivitySD", sep="_")
+    colnames(drugphenot) <- paste(colnames(drugphenot), "Activity.SD", sep="_")
     if(is.null(drugpheno.all)) { drugpheno.all <- drugphenot } else { drugpheno.all <- cbind(drugpheno.all, drugphenot, check.names=FALSE) }
     ## FitType
     drugphenot <- matrix(NA, nrow=length(celln), ncol=length(dix), dimnames=list(as.character(celln), dix))
     for(i in 1:length(celln)) {
-      tt <- drugpheno[drugpheno[ , "cellid"] == celln[i] , "FitType.norm"]
+      tt <- drugpheno[drugpheno[ , "cellid"] == celln[i] , "FitType"]
       names(tt) <- as.character(drugpheno[drugpheno[ , "cellid"] == celln[i] , "drugid"])
       drugphenot[celln[i],names(tt)] <- tt
     }
@@ -163,8 +162,9 @@ getCCLEP <-
     uurl[is.na(celline.ccle[ , "CCLE.name"])] <- NA
     celline.ccle <- data.frame("cellid"=celline.ccle[ , "cellid"], "link"=uurl, celline.ccle[ , !is.element(colnames(celline.ccle), "cellid")], check.names=FALSE)
     
-    
-     ## update drugpheno
+    cellnall <- sort(unique(c(as.character(sampleinfo[ , "cellid"]), as.character(drugpheno[ , "cellid"]))))
+    drugnall <- sort(unique(c(rownames(druginfo), as.character(drugconc[ , "drugid"]), paste("drugid", sapply(strsplit(colnames(drugpheno)[grep("^drugid_", colnames(drugpheno))], "_"), function(x) { return(x[[2]]) }), sep="_"))))
+    ## update drugpheno
     ## IC50 in microM
     iix <- grep("_IC50$", colnames(drugpheno))
     iixn <- gsub("_IC50$", "", colnames(drugpheno)[iix])
