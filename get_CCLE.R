@@ -3,6 +3,8 @@ getCCLEP <-
     verbose=FALSE,
     nthread=1) {
     
+    options(stringsAsFactors=FALSE)
+    badchars <- "[\xb5]|[]|[ ,]|[;]|[:]|[-]|[+]|[*]|[%]|[$]|[#]|[{]|[}]|[[]|[]]|[|]|[\\^]|[/]|[\\]|[.]|[_]|[ ]"
     
     ## drug information
     message("Read drug information")
