@@ -324,3 +324,5 @@ getCCLEP <-
     
     
     }
+
+getCCLEP(nthread=1, verbose=FALSE)
