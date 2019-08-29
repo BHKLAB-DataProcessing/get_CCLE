@@ -330,6 +330,11 @@ getCCLEP <-
   "cnv"=molecular_profiles$cnv)
   )
     
+    curationCell$unique.cellid[which(curationCell$unique.cellid == "MDAMB157")] <- "MDA-MB-157"
+    curationCell$unique.cellid[which(curationCell$unique.cellid == "MB157")] <- "MB 157"
+    curationCell$unique.cellid[which(curationCell$unique.cellid == "COLO-320")] <- "COLO-320-HSR"
+    rownames(curationCell) <- curationCell$unique.cellid
+    
     CCLE <- PharmacoSet(molecularProfiles=z, name="CCLE", cell=celline.ccle, drug=druginfo, sensitivityInfo=sensitivityInfo, sensitivityRaw=raw.sensitivity, sensitivityProfiles=profiles, sensitivityN=NULL,  curationCell=curationCell, curationDrug=curationDrug, curationTissue=curationTissue, datasetType="sensitivity")
 
     save(CCLE, file="/pfs/out/CCLE.RData")
