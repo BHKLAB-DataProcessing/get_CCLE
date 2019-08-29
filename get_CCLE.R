@@ -325,4 +325,6 @@ getCCLEP <-
     
     }
 
+library(PharmacoGx)
+
 getCCLEP(nthread=1, verbose=FALSE)
