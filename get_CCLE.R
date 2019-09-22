@@ -260,8 +260,8 @@ getCCLEP <-
 
 
   profiles <- cbind(profiles, recomputed[rownames(profiles),])
-  profiles[,"AAC"] <- as.numeric(profiles[,"AAC"])
-  profiles[,"IC50"] <- as.numeric(profiles[,"IC50"])
+  profiles[,"aac_recomputed"] <- as.numeric(profiles[,"aac_recomputed"])
+  profiles[,"ic50_recomputed"] <- as.numeric(profiles[,"ic50_recomputed"])
   profiles[,"HS"] <- as.numeric(profiles[,"HS"])
   profiles[,"E_inf"] <- as.numeric(profiles[,"E_inf"])
   profiles[,"EC50"] <- as.numeric(profiles[,"EC50"])
@@ -352,7 +352,7 @@ getCCLEP <-
     
     CCLE <- PharmacoSet(molecularProfiles=z, name="CCLE", cell=celline.ccle, drug=druginfo, sensitivityInfo=sensitivityInfo, sensitivityRaw=raw.sensitivity, sensitivityProfiles=profiles, sensitivityN=NULL,  curationCell=curationCell, curationDrug=curationDrug, curationTissue=curationTissue, datasetType="sensitivity")
 
-    save(CCLE, file="/pfs/out/CCLE.RData")
+    saveRDS(CCLE, file="/pfs/out/CCLE.rds")
     
     return (CCLE)
     
