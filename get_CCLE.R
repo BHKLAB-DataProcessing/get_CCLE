@@ -325,32 +325,76 @@ getCCLEP <-
     
     z <- list()
 
-    z <- c(z,c(
-  "rna"=molecular_profiles$rna,
-  "rnaseq"=molecular_profiles$rnaseq,
-  "mutation"=molecular_profiles$mutation,
-  "cnv"=molecular_profiles$cnv)
-  )
+
     
-    curationCell$unique.cellid[which(curationCell$unique.cellid == "MDAMB157")] <- "MDA-MB-157"
-    curationCell$unique.cellid[which(curationCell$unique.cellid == "MB157")] <- "MB 157"
-    curationCell$unique.cellid[which(curationCell$unique.cellid == "COLO-320")] <- "COLO-320-HSR"
-    rownames(curationCell) <- curationCell$unique.cellid
+    #summarize rnaseq quantifications into expression sets (Kallisto)
+                                   
+    summarizeRnaSeq <- function (dir, 
+                                 tool=c("kallisto", "stringtie", "cufflinks", "rsem", "salmon"), 
+                                 features_annotation,
+                                 samples_annotation) {
+      library(Biobase)
+      library(readr)
+      library(tximport)
+      
+      load(features_annotation)
+      tx2gene <- as.data.frame(cbind("transcript"=toil.transcripts$transcript_id, "gene"=toil.transcripts$gene_id))
+      
+      files <- list.files(dir, recursive = TRUE, full.names = T)
+      resFiles <- grep("abundance.h5", files)
+      resFiles <- files[resFiles]
+      length(resFiles)
+      names(resFiles) <- basename(dirname(resFiles))
+      
+      txi <- tximport(resFiles, type="kallisto", tx2gene=tx2gene)
+      head(txi$counts[,1:5])
+      dim(txi$counts)
+      
+      xx <- txi$abundance
+      gene.exp <- Biobase::ExpressionSet(log2(xx + 0.001))
+      fData(gene.exp) <- toil.genes[featureNames(gene.exp),]
+      pData(gene.exp) <- samples_annotation[sampleNames(gene.exp),]
+      annotation(gene.exp) <- "rnaseq"
+      
+      xx <- txi$counts
+      gene.count <- Biobase::ExpressionSet(log2(xx + 1))
+      fData(gene.count) <- toil.genes[featureNames(gene.count),]
+      pData(gene.count) <- samples_annotation[sampleNames(gene.count),]
+      annotation(gene.count) <- "rnaseq"
+      
+      txii <- tximport(resFiles, type="kallisto", txOut=T)
+      
+      xx <- txii$abundance
+      transcript.exp <- Biobase::ExpressionSet(log2(xx[,1:length(resFiles)] + 0.001))
+      fData(transcript.exp) <- toil.transcripts[featureNames(transcript.exp),]
+      pData(transcript.exp) <- samples_annotation[sampleNames(transcript.exp),]
+      annotation(transcript.exp) <- "isoforms"
+      
+      xx <- txii$counts
+      transcript.count <- Biobase::ExpressionSet(log2(xx[,1:length(resFiles)] + 1))
+      fData(transcript.count) <- toil.transcripts[featureNames(transcript.count),]
+      pData(transcript.count) <- samples_annotation[sampleNames(transcript.count),]
+      annotation(transcript.count) <- "isoforms"
+      
+      return(list("rnaseq"=gene.exp, 
+                  "rnaseq.counts"=gene.count, 
+                  "isoforms"=transcript.exp, 
+                  "isoforms.counts"=transcript.count))
+    }
     
-    rownames(celline.ccle)[which(rownames(celline.ccle) == "MDAMB157")] <- "MDA-MB-157"
-    rownames(celline.ccle)[which(rownames(celline.ccle) == "MB157")] <- "MB 157"
-    rownames(celline.ccle)[which(rownames(celline.ccle) == "COLO-320")] <- "COLO-320-HSR"
+
+    rnaseq.sampleinfo <- read.csv("/pfs/getCCLE/ccle_rnaseq_curation.csv", stringsAsFactors=FALSE, row.names=1)
+    
+    rnaseq.sampleinfo$cellid <- as.character(matchToIDTable(ids=rnaseq.sampleinfo$cellid, tbl=curationCell, column = "CCLE_rnaseq.cellid", returnColumn = "unique.cellid"))
+   
+    rnaseq <- summarizeRnaSeq(dir="/pfs/downloadcclemolec/CCLE_Kallisto_0.43.1_processed/CCLE_Kallisto_0.43.1_processed", 
+                                tool="kallisto", 
+                                features_annotation="/pfs/getCCLE/Gencode.v23.annotation.RData",
+                                samples_annotation=rnaseq.sampleinfo)
     
     
-    rownames(curationTissue)[which(rownames(curationTissue) == "MDAMB157")] <- "MDA-MB-157"
-    rownames(curationTissue)[which(rownames(curationTissue) == "MB157")] <- "MB 157"
-    rownames(curationTissue)[which(rownames(curationTissue) == "COLO-320")] <- "COLO-320-HSR"
     
-    sensitivityInfo$cellid[which(sensitivityInfo$cellid == "MDAMB157")] <- "MDA-MB-157"
-    sensitivityInfo$cellid[which(sensitivityInfo$cellid == "MB157")] <- "MB 157"
-    sensitivityInfo$cellid[which(sensitivityInfo$cellid == "COLO-320")] <- "COLO-320-HSR"
-    
-    CCLE <- PharmacoSet(molecularProfiles=z, name="CCLE", cell=celline.ccle, drug=druginfo, sensitivityInfo=sensitivityInfo, sensitivityRaw=raw.sensitivity, sensitivityProfiles=profiles, sensitivityN=NULL,  curationCell=curationCell, curationDrug=curationDrug, curationTissue=curationTissue, datasetType="sensitivity")
+    CCLE <- PharmacoSet(molecularProfiles=rnaseq, name="CCLE", cell=celline.ccle, drug=druginfo, sensitivityInfo=sensitivityInfo, sensitivityRaw=raw.sensitivity, sensitivityProfiles=profiles, sensitivityN=NULL,  curationCell=curationCell, curationDrug=curationDrug, curationTissue=curationTissue, datasetType="sensitivity")
 
     saveRDS(CCLE, file="/pfs/out/CCLE.rds")
     
