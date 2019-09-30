@@ -3,7 +3,19 @@ getCCLEP <-
     verbose=FALSE,
     nthread=1) {
     
-        options(stringsAsFactors = FALSE)
+    options(stringsAsFactors = FALSE)
+    
+    matchToIDTable <- function(ids,tbl, column, returnColumn="unique.cellid") {
+      sapply(ids, function(x) {
+        myx <- grep(paste0("((///)|^)",Hmisc::escapeRegex(x),"((///)|$)"), tbl[,column])
+        if(length(myx) > 1){
+          stop("Something went wrong in curating ids, we have multiple matches")
+        }
+        if(length(myx) == 0){return(NA_character_)}
+        return(tbl[myx, returnColumn])
+      })
+    }
+    
     badchars <- "[\xb5]|[]|[ ,]|[;]|[:]|[-]|[+]|[*]|[%]|[$]|[#]|[{]|[}]|[[]|[]]|[|]|[\\^]|[/]|[\\]|[.]|[_]|[ ]"
     ## drug information
     message("Read drug information")
