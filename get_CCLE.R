@@ -321,10 +321,7 @@ getCCLEP <-
     ##update tissueid to be unique tissueid
     celline.ccle[ , "tissueid"] <- curationTissue[rownames(celline.ccle), "unique.tissueid"]
 
-    load("/pfs/downloadcclemolec/CCLE_MolecProfiles.RData")
-    
     z <- list()
-
 
     
     #summarize rnaseq quantifications into expression sets (Kallisto)
