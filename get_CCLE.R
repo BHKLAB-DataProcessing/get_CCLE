@@ -406,7 +406,124 @@ getCCLEP <-
     
     
     
-    CCLE <- PharmacoSet(molecularProfiles=rnaseq, name="CCLE", cell=celline.ccle, drug=druginfo, sensitivityInfo=sensitivityInfo, sensitivityRaw=raw.sensitivity, sensitivityProfiles=profiles, sensitivityN=NULL,  curationCell=curationCell, curationDrug=curationDrug, curationTissue=curationTissue, datasetType="sensitivity")
+    #rna
+    
+    load("/pfs/downloadcclemolec/ccle_rna.RData")
+    rna$cellid <- matchToIDTable(ids=rna$Cell.line.primary.name, tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid")
+ 
+    
+    #cnv
+    load("/pfs/downloadcclemolec/ccle.cnv.eset.RData")
+    colnames(pData(ccle.eset)) <- gsub("!", "", colnames(pData(ccle.eset)))
+    ccle.eset <- ccle.eset[ , which(!is.na(pData(ccle.eset)[, "Sample_title"]))]
+    tt <- rownames(pData(ccle.eset))
+    pData(ccle.eset) <- as.data.frame(apply(pData(ccle.eset), MARGIN=2, as.character), stringsAsFactors=FALSE)
+    rownames(pData(ccle.eset)) <- tt
+    pData(ccle.eset)[ , "cellid"] <- as.character(matchToIDTable(ids=pData(ccle.eset)[, "Sample_title"], tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid"))
+    pData(ccle.eset)[,"batchid"] <- NA
+    annot <- read.csv("/pfs/downAnnotations/annot_ensembl_all_genes.csv", stringsAsFactors=FALSE, check.names=FALSE, header=TRUE, row.names=1)
+    tt <- annot[match(rownames(fData(ccle.eset)), annot$gene_name), c("gene_id", "EntrezGene.ID", "gene_name", "gene_biotype")]
+    rownames(tt) <- rownames(fData(ccle.eset))
+    colnames(tt) <- c("EnsemblGeneId", "EntrezGeneId", "Symbol", "GeneBioType")
+    fData(ccle.eset) <- tt
+    annotation(ccle.eset) <- "cnv"
+    tt <- exprs(ccle.eset)  
+    temp <- rownames(tt)
+    tt <- apply(tt, MARGIN=2, as.numeric)
+    rownames(tt) <- temp
+    exprs(ccle.eset) <- tt
+    data <- exprs(ccle.eset)
+    tt <- apply(data, MARGIN = 1, function(x){table(is.na(x))["FALSE"]})
+    features <- setdiff(rownames(exprs(ccle.eset)), names(tt)[which(is.na(tt))])
+    ccle.eset <- ccle.eset[features, ]
+    
+    #mutation
+    
+    ## from hybrid capture
+  mut <- read.csv("/pfs/downloadcclemolec/CCLE_hybrid_capture1650_hg19_NoCommonSNPs_NoNeutralVariants_CDS_2012.05.07.maf", sep="\t")
+  mut <- mut[ , c("Hugo_Symbol", "Tumor_Sample_Barcode", "Protein_Change"), drop=FALSE]
+  mut[!is.na(mut) & mut == ""] <- NA
+  mut[is.na(mut[ , "Protein_Change"]) | mut[ , "Protein_Change"] == "", "Protein_Change"] <- "wt"
+  mut[!is.na(mut[ , "Protein_Change"]) & (mut[ , "Protein_Change"] == "p.?" | mut[ , "Protein_Change"] == "p.0?"), "Protein_Change"] <- NA
+  mut <- mut[complete.cases(mut), , drop=FALSE]
+  myx <- !duplicated(paste(mut[ , c("Tumor_Sample_Barcode")], mut[ , c("Hugo_Symbol")], mut[ , c("Protein_Change")], sep="///"))
+  mut <- mut[myx, , drop=FALSE]
+  ## from oncomap
+  mut2 <- read.csv("/pfs/downloadcclemolec/CCLE_Oncomap3_2012-04-09.maf", sep="\t")
+  mut2 <- mut2[ , c("Hugo_Symbol", "Tumor_Sample_Barcode", "Protein_Change"), drop=FALSE]
+  mut2[!is.na(mut2) & mut2 == ""] <- NA
+  # mut2[is.na(mut2[ , "Protein_Change"]) | mut2[ , "Protein_Change"] == "", "Protein_Change"] <- "wt"
+  mut2[!is.na(mut2[ , "Protein_Change"]) & (mut2[ , "Protein_Change"] == "p.?" | mut2[ , "Protein_Change"] == "p.0?"), "Protein_Change"] <- NA  
+  mut2 <- mut2[complete.cases(mut2), , drop=FALSE]
+  myx <- !duplicated(paste(mut2[ , c("Tumor_Sample_Barcode")], mut2[ , c("Hugo_Symbol")], mut2[ , c("Protein_Change")], sep="///"))
+  mut2 <- mut2[myx, , drop=FALSE]
+  ## merge mutations discovered by hybrid capture and oncomap
+  mutation <- rbind(mut, mut2)
+  ucell <- sort(unique(mutation[ , "Tumor_Sample_Barcode"]))
+  ugene <- sort(unique(mutation[ , "Hugo_Symbol"]))
+  
+  dd <- matrix("wt", nrow=length(ucell), ncol=length(ugene), dimnames=list(ucell, ugene))
+  ## maximum number of mutations per gene
+  # mutmax <- max(table(paste(mutation[ , c("Tumor_Sample_Barcode")], mutation[ , c("Hugo_Symbol")], sep="::")))
+  mm <- 1:nrow(mutation)
+  ff <- TRUE
+  while(length(mm) > 1) {
+    myx <- !duplicated(paste(mutation[mm, c("Tumor_Sample_Barcode")], mutation[mm, c("Hugo_Symbol")], sep="///"))
+    if(ff) {
+      dd[as.matrix(mutation[mm[myx], c("Tumor_Sample_Barcode", "Hugo_Symbol")])] <- mutation[mm[myx], "Protein_Change"]
+      ff <- FALSE
+    } else {
+      dd[as.matrix(mutation[mm[myx], c("Tumor_Sample_Barcode", "Hugo_Symbol")])] <- paste(dd[as.matrix(mutation[mm[myx], c("Tumor_Sample_Barcode", "Hugo_Symbol")])], mutation[mm[myx], "Protein_Change"], sep="///")
+    }
+    mm <- mm[!myx]
+  }
+  ## check for inconsistencies (wt + mutations)
+  iix <- grep("///", dd)
+  for(iii in iix) {
+    x <- sort(unique(unlist(strsplit(dd[iii], split="///"))))
+    if(length(x) > 1) { x <- x[!is.element(x, "wt")] }
+    dd[iii] <- paste(x, collapse="///")
+  }
+  nn <- sampleinfo[match(rownames(dd), sampleinfo[ , "CCLE.name"]), "cellid"]
+  ## remove if we do not have cell line identifier
+  dd <- dd[!is.na(nn), , drop=FALSE]
+  nn <- as.character(matchToIDTable(ids=nn, tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid"))
+  rownames(dd) <- nn[!is.na(nn)]
+  mutation <- dd
+  
+  mutation <- mutation[unique(rownames(mutation)),]
+  
+  MutationEset <- ExpressionSet(t(mutation))
+  geneMap <- read.csv("/pfs/downAnnotations/annot_ensembl_all_genes.csv", as.is=TRUE)
+  geneInfoM <- geneMap[na.omit(match(rownames(MutationEset),geneMap[ , "gene_name"]) ), c('gene_id', 'gene_biotype', 'gene_name', 'EntrezGene.ID')]
+  rownames(geneInfoM) <- geneInfoM[ , "gene_name"]
+  geneInfoM <- geneInfoM[rownames(MutationEset),]
+  rownames(geneInfoM) <- rownames(MutationEset)
+  colnames(geneInfoM) <- c("EnsemblGeneId", "GeneBioType", "Symbol", "EntrezGeneId")
+  fData(MutationEset) <- geneInfoM
+  tttt <- data.frame(row.names=colnames(MutationEset), colnames(MutationEset))
+  colnames(tttt) <- 'cellid'
+  pData(MutationEset) <- tttt
+  annotation(MutationEset) <- "mutation"
+  pData(MutationEset)[ , "batchid"] <- NA
+    
+    
+  z <- list()
+  
+  z <- c(z,c(
+    "rna"=rna,
+    "rnaseq"=rnaseq$rnaseq,
+    "rnaseq.counts"=rnaseq$rnaseq.counts,
+    "isoforms"=rnaseq$isoforms,
+    "isoforms.counts"=rnaseq$isoforms.counts,
+    "mutation"=MutationEset,
+    "cnv"=ccle.eset)
+  )
+    
+
+       
+    
+    CCLE <- PharmacoSet(molecularProfiles=z, name="CCLE", cell=celline.ccle, drug=druginfo, sensitivityInfo=sensitivityInfo, sensitivityRaw=raw.sensitivity, sensitivityProfiles=profiles, sensitivityN=NULL,  curationCell=curationCell, curationDrug=curationDrug, curationTissue=curationTissue, datasetType="sensitivity")
 
     saveRDS(CCLE, file="/pfs/out/CCLE.rds")
     
