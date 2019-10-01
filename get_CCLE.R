@@ -492,6 +492,12 @@ getCCLEP <-
   mutation <- dd
   
   mutation <- mutation[unique(rownames(mutation)),]
+  save(drugpheno, file="/pfs/out/drug_pheno.RData")
+    
+  cellnall <- sort(unique(c(as.character(sampleinfo[ , "cellid"]), as.character(drugpheno[ , "cellid"]), rownames(mutation))))
+  dd <- matrix(NA, ncol=ncol(mutation), nrow=length(cellnall), dimnames=list(cellnall, colnames(mutation)))
+  dd[rownames(mutation), colnames(mutation)] <- mutation
+  mutation <- dd
   
   MutationEset <- ExpressionSet(t(mutation))
   geneMap <- read.csv("/pfs/downAnnotations/annot_ensembl_all_genes.csv", as.is=TRUE)
