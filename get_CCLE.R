@@ -393,9 +393,9 @@ getCCLEP <-
     
 
     rnaseq.sampleinfo <- read.csv("/pfs/getCCLE/ccle_rnaseq_curation.csv", stringsAsFactors=FALSE)
-    rownames(rnaseq_sampleinfo) <- gsub(".bam", "",rnaseq_sampleinfo[ , "file_name"])
-    rnaseq_sampleinfo <- rnaseq_sampleinfo[ ,-1]
-    rnaseq_sampleinfo <- rnaseq_sampleinfo[ ,-1]
+    rownames(rnaseq.sampleinfo) <- gsub(".bam", "",rnaseq.sampleinfo[ , "file_name"])
+    rnaseq.sampleinfo <- rnaseq.sampleinfo[ ,-1]
+    rnaseq.sampleinfo <- rnaseq.sampleinfo[ ,-1]
     
     rnaseq.sampleinfo$cellid <- as.character(matchToIDTable(ids=rnaseq.sampleinfo$cellid, tbl=curationCell, column = "CCLE_rnaseq.cellid", returnColumn = "unique.cellid"))
    
