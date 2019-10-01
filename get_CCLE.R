@@ -392,7 +392,10 @@ getCCLEP <-
     }
     
 
-    rnaseq.sampleinfo <- read.csv("/pfs/getCCLE/ccle_rnaseq_curation.csv", stringsAsFactors=FALSE, row.names=1)
+    rnaseq.sampleinfo <- read.csv("/pfs/getCCLE/ccle_rnaseq_curation.csv", stringsAsFactors=FALSE)
+    rownames(rnaseq_sampleinfo) <- gsub(".bam", "",rnaseq_sampleinfo[ , "file_name"])
+    rnaseq_sampleinfo <- rnaseq_sampleinfo[ ,-1]
+    rnaseq_sampleinfo <- rnaseq_sampleinfo[ ,-1]
     
     rnaseq.sampleinfo$cellid <- as.character(matchToIDTable(ids=rnaseq.sampleinfo$cellid, tbl=curationCell, column = "CCLE_rnaseq.cellid", returnColumn = "unique.cellid"))
    
