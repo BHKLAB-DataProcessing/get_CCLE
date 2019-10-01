@@ -318,7 +318,7 @@ getCCLEP <-
     celline.ccle <- rbind(celline.ccle,tt)
     
     ##update sensitivity info cellid to be unique.cellid
-    sensitivityInfo[ , "cellid"] <- rownames(curationCell)[match(sensitivityInfo[ , "cellid"], curationCell[ , "CCLE.cellid"])]
+    sensitivityInfo[ , "cellid"] <- as.character(matchToIDTable(ids=sensitivityInfo[ , "cellid"], tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid"))
     ###!!!!!!!!!!!!!!!!!!!!!!!
     ##check for PD-0332991 next time
     ###!!!!!!!!!!!!!!!!!!!!!!!
