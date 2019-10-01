@@ -487,17 +487,18 @@ getCCLEP <-
   nn <- sampleinfo[match(rownames(dd), sampleinfo[ , "CCLE.name"]), "cellid"]
   ## remove if we do not have cell line identifier
   dd <- dd[!is.na(nn), , drop=FALSE]
-  nn <- as.character(matchToIDTable(ids=nn, tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid"))
+  #nn <- as.character(matchToIDTable(ids=nn, tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid"))
   rownames(dd) <- nn[!is.na(nn)]
   mutation <- dd
   
-  mutation <- mutation[unique(rownames(mutation)),]
   save(drugpheno, file="/pfs/out/drug_pheno.RData")
     
   cellnall <- sort(unique(c(as.character(sampleinfo[ , "cellid"]), as.character(drugpheno[ , "cellid"]), rownames(mutation))))
   dd <- matrix(NA, ncol=ncol(mutation), nrow=length(cellnall), dimnames=list(cellnall, colnames(mutation)))
   dd[rownames(mutation), colnames(mutation)] <- mutation
   mutation <- dd
+  rownames(mutation) <- as.character(matchToIDTable(ids=rownames(mutation), tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid"))
+  mutation <- mutation[unique(rownames(mutation)),]
   
   MutationEset <- ExpressionSet(t(mutation))
   geneMap <- read.csv("/pfs/downAnnotations/annot_ensembl_all_genes.csv", as.is=TRUE)
@@ -512,6 +513,7 @@ getCCLEP <-
   pData(MutationEset) <- tttt
   annotation(MutationEset) <- "mutation"
   pData(MutationEset)[ , "batchid"] <- NA
+  pData(MutationEset)[ , "cellid"] <- as.character(matchToIDTable(ids=pData(MutationEset)[ , "cellid"], tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid"))
     
     
   z <- list()
