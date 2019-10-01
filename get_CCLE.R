@@ -513,7 +513,7 @@ getCCLEP <-
   pData(MutationEset) <- tttt
   annotation(MutationEset) <- "mutation"
   pData(MutationEset)[ , "batchid"] <- NA
-  pData(MutationEset)[ , "cellid"] <- as.character(matchToIDTable(ids=pData(MutationEset)[ , "cellid"], tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid"))
+  
     
     
   z <- list()
