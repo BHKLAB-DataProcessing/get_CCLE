@@ -270,9 +270,9 @@ getCCLEP <-
 
 
   profiles <- cbind(profiles, recomputed[rownames(profiles),])
-  print(str(profiles))
-  profiles[,"aac_recomputed"] <- as.numeric(profiles[,"aac_recomputed"])
-  profiles[,"ic50_recomputed"] <- as.numeric(profiles[,"ic50_recomputed"])
+  print(colnames(recomputed))
+  profiles[,"AAC"] <- as.numeric(profiles[,"AAC"])
+  profiles[,"IC50"] <- as.numeric(profiles[,"IC50"])
   profiles[,"HS"] <- as.numeric(profiles[,"HS"])
   profiles[,"E_inf"] <- as.numeric(profiles[,"E_inf"])
   profiles[,"EC50"] <- as.numeric(profiles[,"EC50"])
