@@ -418,7 +418,7 @@ getCCLEP <-
     tt <- rownames(pData(ccle.eset))
     pData(ccle.eset) <- as.data.frame(apply(pData(ccle.eset), MARGIN=2, as.character), stringsAsFactors=FALSE)
     rownames(pData(ccle.eset)) <- tt
-    pData(ccle.eset)[ , "cellid"] <- as.character(matchToIDTable(ids=pData(ccle.eset)[, "Cell line primary name"], tbl=cell.all, column = "CCLE.cellid", returnColumn = "unique.cellid"))
+    pData(ccle.eset)[ , "cellid"] <- as.character(matchToIDTable(ids=pData(ccle.eset)[, "Cell line primary name"], tbl=cell_all, column = "CCLE.cellid", returnColumn = "unique.cellid"))
     pData(ccle.eset)[,"batchid"] <- NA
     tt <- annot[match(rownames(fData(ccle.eset)), annot$gene_name), c("gene_id", "EntrezGene.ID", "gene_name", "gene_biotype")]
     rownames(tt) <- rownames(fData(ccle.eset))
