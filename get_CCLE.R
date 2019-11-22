@@ -514,6 +514,34 @@ getCCLEP <-
   pData(MutationEset)[ , "batchid"] <- NA
   
     
+  #add missing celllines and drugs to cell/drug info
+    
+  cellnall <- unionList(rownames(celline.ccle), 
+					  ccle.eset$cellid, 
+					  rna$cellid, 
+		     		rnaseq$cellid,
+		     		MutationEset$cellid)
+    
+newcells <- setdiff(cellnall, rownames(celline.ccle))
+newRows <- matrix(NA_character_, nrow=length(newcells), ncol=ncol(celline.ccle))
+# newRows <- cell.info[newcells,]
+
+rownames(newRows) <- newcells
+colnames(newRows) <- colnames(celline.ccle)
+newRows[,"unique.cellid"] <- newcells
+
+celline.ccle <- rbind(celline.ccle, newRows)
+    
+cellsPresent <- sort(unionList(sensitivityInfo$cellid, 
+					  pData(rna)$cellid, 
+					  pData(MutationEset)$cellid,
+					  pData(ccle.eset)$cellid,
+		    		pData(rnaseq)$cellid))
+    
+celline.ccle <- celline.ccle[cellsPresent,]    
+    
+
+    
     
   z <- list()
   
