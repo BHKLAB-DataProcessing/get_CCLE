@@ -269,9 +269,8 @@ getCCLEP <-
     names(Amax) <- names(raw.sensitivity)
 
 
-
-
   profiles <- cbind(profiles, recomputed[rownames(profiles),])
+  print(str(profiles))
   profiles[,"aac_recomputed"] <- as.numeric(profiles[,"aac_recomputed"])
   profiles[,"ic50_recomputed"] <- as.numeric(profiles[,"ic50_recomputed"])
   profiles[,"HS"] <- as.numeric(profiles[,"HS"])
