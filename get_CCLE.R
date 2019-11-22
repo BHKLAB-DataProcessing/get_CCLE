@@ -412,15 +412,14 @@ getCCLEP <-
  
     
     #cnv
-    load("/pfs/downloadcclemolec/ccle.cnv.eset.RData")
-    colnames(pData(ccle.eset)) <- gsub("!", "", colnames(pData(ccle.eset)))
-    ccle.eset <- ccle.eset[ , which(!is.na(pData(ccle.eset)[, "Sample_title"]))]
+    ttt <- readRDS("/pfs/downloadcclemolec/CCLE_CN.gene.RDS")
+    ccle.eset <- ttt
+    ccle.eset <- ccle.eset[ , which(!is.na(pData(ccle.eset)[, "Cell line primary name"]))]
     tt <- rownames(pData(ccle.eset))
     pData(ccle.eset) <- as.data.frame(apply(pData(ccle.eset), MARGIN=2, as.character), stringsAsFactors=FALSE)
     rownames(pData(ccle.eset)) <- tt
-    pData(ccle.eset)[ , "cellid"] <- as.character(matchToIDTable(ids=pData(ccle.eset)[, "Sample_title"], tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid"))
+    pData(ccle.eset)[ , "cellid"] <- as.character(matchToIDTable(ids=pData(ccle.eset)[, "Cell line primary name"], tbl=cell.all, column = "CCLE.cellid", returnColumn = "unique.cellid"))
     pData(ccle.eset)[,"batchid"] <- NA
-    annot <- read.csv("/pfs/downAnnotations/annot_ensembl_all_genes.csv", stringsAsFactors=FALSE, check.names=FALSE, header=TRUE, row.names=1)
     tt <- annot[match(rownames(fData(ccle.eset)), annot$gene_name), c("gene_id", "EntrezGene.ID", "gene_name", "gene_biotype")]
     rownames(tt) <- rownames(fData(ccle.eset))
     colnames(tt) <- c("EnsemblGeneId", "EntrezGeneId", "Symbol", "GeneBioType")
