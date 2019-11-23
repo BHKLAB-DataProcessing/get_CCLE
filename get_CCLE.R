@@ -269,16 +269,17 @@ getCCLEP <-
     names(Amax) <- names(raw.sensitivity)
 
 
-  profiles <- cbind(profiles, recomputed[rownames(profiles),])
-  print(colnames(recomputed))
-  profiles[,"AAC"] <- as.numeric(profiles[,"AAC"])
-  profiles[,"IC50"] <- as.numeric(profiles[,"IC50"])
-  profiles[,"HS"] <- as.numeric(profiles[,"HS"])
-  profiles[,"E_inf"] <- as.numeric(profiles[,"E_inf"])
-  profiles[,"EC50"] <- as.numeric(profiles[,"EC50"])
+    profiles <- cbind(profiles, recomputed[rownames(profiles),])
+    profiles[,"AAC"] <- as.numeric(profiles[,"AAC"])
+    profiles[,"IC50"] <- as.numeric(profiles[,"IC50"])
+    profiles[,"HS"] <- as.numeric(profiles[,"HS"])
+    profiles[,"E_inf"] <- as.numeric(profiles[,"E_inf"])
+    profiles[,"EC50"] <- as.numeric(profiles[,"EC50"])
     
     profiles <- cbind(profiles, "amax_recomputed"= Amax)    
-    
+    names(profiles)[1] <- "aac_recomputed"
+    names(profiles)[2] <- "ic50_recomputed"
+	  
     print("Profiles done")
     ### Temporary solution while we wait for the release of PharmacoDb!!!
     
