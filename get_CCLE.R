@@ -539,6 +539,20 @@ cellsPresent <- sort(unionList(sensitivityInfo$cellid,
 		    		rnaseq$cellid))
     
 celline.ccle <- celline.ccle[cellsPresent,]    
+	  
+	  
+drugsPresent <- sort(unique(sensitivityInfo$drugid))
+
+druginfo <- druginfo[drugsPresent,]
+	  
+	  
+drug_all <- read.csv("/pfs/downAnnotations/drugs_with_ids.csv", na.strings=c("", " ", "NA"))
+drug_all <- drug_all[which(!is.na(drug_all[ , "CCLE.drugid"])),]
+drug_all <- drug_all[ , c("unique.drugid", "CCLE.drugid","smiles","inchikey","cid","FDA")]
+rownames(drug_all) <- drug_all[ , "unique.drugid"]
+
+drug_all <- drug_all[rownames(druginfo),]
+druginfo[,c("smiles","inchikey","cid","FDA")] <- drug_all[,c("smiles","inchikey","cid","FDA")]
     
 
     
