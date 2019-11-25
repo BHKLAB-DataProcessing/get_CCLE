@@ -242,7 +242,7 @@ getCCLEP <-
     amax <- c(drugpheno.amax)
     names(amax) <- nms
     
-    profiles <- cbind("ic50_published"=ic50, "auc_published"=auc, "amax_published"=amax)
+    profiles <- cbind("ic50_published"=ic50, "aac_published"=auc, "amax_published"=amax)
     drugpheno.auc.ccle <-drugpheno.auc
     drugpheno.ic50.ccle <- drugpheno.ic50
     drugpheno.amax.ccle <- drugpheno.amax
@@ -268,17 +268,18 @@ getCCLEP <-
     }
     names(Amax) <- names(raw.sensitivity)
 
-
-    profiles <- cbind(profiles, recomputed[rownames(profiles),])
-    profiles[,"AAC"] <- as.numeric(profiles[,"AAC"])
-    profiles[,"IC50"] <- as.numeric(profiles[,"IC50"])
-    profiles[,"HS"] <- as.numeric(profiles[,"HS"])
-    profiles[,"E_inf"] <- as.numeric(profiles[,"E_inf"])
-    profiles[,"EC50"] <- as.numeric(profiles[,"EC50"])
     
-    profiles <- cbind(profiles, "amax_recomputed"= Amax)    
-    names(profiles)[1] <- "aac_recomputed"
-    names(profiles)[2] <- "ic50_recomputed"
+    profiles <- cbind(profiles, recomputed[rownames(profiles),])
+    sensitivity.profiles <- data.frame("aac_recomputed" = as.numeric(profiles[,"AAC"]), "ic50_recomputed"=as.numeric(profiles[,"IC50"]), "HS"=as.numeric(profiles[,"HS"]), "E_inf"=as.numeric(profiles[,"E_inf"]), "EC50"=as.numeric(profiles[,"EC50"]))
+    #profiles[,"AAC"] <- as.numeric(profiles[,"AAC"])
+    #profiles[,"IC50"] <- as.numeric(profiles[,"IC50"])
+    #profiles[,"HS"] <- as.numeric(profiles[,"HS"])
+    #profiles[,"E_inf"] <- as.numeric(profiles[,"E_inf"])
+    #profiles[,"EC50"] <- as.numeric(profiles[,"EC50"])
+    
+    sensitivity.profiles <- cbind(sensitivity.profiles, "amax_recomputed"= Amax)    
+    sensitivity.profiles$aac_recomputed <- sensitivity.profiles$aac_recomputed/100
+    rownames(sensitivity.profiles) <- rownames(profiles)
 	  
     print("Profiles done")
     ### Temporary solution while we wait for the release of PharmacoDb!!!
@@ -573,7 +574,7 @@ druginfo[,c("smiles","inchikey","cid","FDA")] <- drug_all[,c("smiles","inchikey"
 
        
     
-    CCLE <- PharmacoSet(molecularProfiles=z, name="CCLE", cell=celline.ccle, drug=druginfo, sensitivityInfo=sensitivityInfo, sensitivityRaw=raw.sensitivity, sensitivityProfiles=profiles, sensitivityN=NULL,  curationCell=curationCell, curationDrug=curationDrug, curationTissue=curationTissue, datasetType="sensitivity")
+    CCLE <- PharmacoSet(molecularProfiles=z, name="CCLE", cell=celline.ccle, drug=druginfo, sensitivityInfo=sensitivityInfo, sensitivityRaw=raw.sensitivity, sensitivityProfiles=sensitivity.profiles, sensitivityN=NULL,  curationCell=curationCell, curationDrug=curationDrug, curationTissue=curationTissue, datasetType="sensitivity")
 
     saveRDS(CCLE, file="/pfs/out/CCLE.rds")
     
