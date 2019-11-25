@@ -263,10 +263,10 @@ getCCLEP <-
     
     print("Compute AMAX")
     Amax <- NULL
-    for (exp in rownames(raw.sensitivity)){
-      Amax <- c(Amax, PharmacoGx::computeAmax(conc=raw.sensitivity[exp, , "Dose"], viability=raw.sensitivity[exp, , "Viability"]))
+    for (exp in names(raw.sensitivity)){
+      Amax <- c(Amax, computeAmax(conc=raw.sensitivity[exp, , "Dose"], viability=raw.sensitivity[exp, , "Viability"]))
     }
-    rownames(Amax) <- rownames(raw.sensitivity)
+    names(Amax) <- names(raw.sensitivity)
 
     
     profiles <- cbind(profiles, recomputed[rownames(profiles),])
@@ -498,8 +498,8 @@ getCCLEP <-
   dd <- matrix(NA, ncol=ncol(mutation), nrow=length(cellnall), dimnames=list(cellnall, colnames(mutation)))
   dd[rownames(mutation), colnames(mutation)] <- mutation
   mutation <- dd
-  rownames(mutation) <- as.character(matchToIDTable(ids=rownames(mutation), tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid"))
-  mutation <- mutation[unique(rownames(mutation)),]
+  #rownames(mutation) <- as.character(matchToIDTable(ids=rownames(mutation), tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid"))
+  #mutation <- mutation[unique(rownames(mutation)),]
   
   MutationEset <- ExpressionSet(t(mutation))
   geneMap <- read.csv("/pfs/downAnnotations/annot_ensembl_all_genes.csv", as.is=TRUE)
@@ -514,14 +514,14 @@ getCCLEP <-
   pData(MutationEset) <- tttt
   annotation(MutationEset) <- "mutation"
   pData(MutationEset)[ , "batchid"] <- NA
-  
+  pData(MutationEset)[ , "cellid"] <- as.character(matchToIDTable(ids=pData(MutationEset)[ , "cellid"], tbl=curationCell, column="CCLE.cellid", returnColumn = "unique.cellid"))
     
   #add missing celllines and drugs to cell/drug info
     
   cellnall <- unionList(rownames(celline.ccle), 
 			ccle.eset$cellid, 
 		        rna$cellid, 
-		        rnaseq$cellid,
+		        rnaseq$rnaseq$cellid,
 		        MutationEset$cellid)
     
 newcells <- setdiff(cellnall, rownames(celline.ccle))
@@ -538,7 +538,7 @@ cellsPresent <- sort(unionList(sensitivityInfo$cellid,
 				rna$cellid, 
 				MutationEset$cellid,
 				ccle.eset$cellid,
-		    		rnaseq$cellid))
+		    		rnaseq$rnaseq$cellid))
     
 celline.ccle <- celline.ccle[cellsPresent,]    
 	  
