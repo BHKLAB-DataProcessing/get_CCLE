@@ -262,11 +262,11 @@ getCCLEP <-
     profiles <- profiles[rownames(sensitivityInfo),]
     
     print("Compute AMAX")
-    Amax <- NULL
-    for (exp in names(raw.sensitivity)){
-      Amax <- c(Amax, computeAmax(conc=raw.sensitivity[exp, , "Dose"], viability=raw.sensitivity[exp, , "Viability"]))
-    }
-    names(Amax) <- names(raw.sensitivity)
+    #Amax <- NULL
+    #for (exp in names(raw.sensitivity)){
+      #Amax <- c(Amax, computeAmax(conc=raw.sensitivity[exp, , "Dose"], viability=raw.sensitivity[exp, , "Viability"]))
+    #}
+    #names(Amax) <- names(raw.sensitivity)
 
     
     profiles <- cbind(profiles, recomputed[rownames(profiles),])
@@ -277,9 +277,9 @@ getCCLEP <-
     profiles[,"E_inf"] <- as.numeric(profiles[,"E_inf"])
     profiles[,"EC50"] <- as.numeric(profiles[,"EC50"])
     
-    profiles <- cbind(profiles, "amax_recomputed"= Amax)    
+    #profiles <- cbind(profiles, "amax_recomputed"= Amax)    
     profiles$AAC <- profiles$AAC/100
-    colnames(profiles) <- c("ic50_published","aac_published","amax_published","aac_recomputed","ic50_recomputed","HS","E_inf","EC50","amax_recomputed")
+    colnames(profiles) <- c("ic50_published","aac_published","amax_published","aac_recomputed","ic50_recomputed","HS","E_inf","EC50")
 	  
     print("Profiles done")
     ### Temporary solution while we wait for the release of PharmacoDb!!!
