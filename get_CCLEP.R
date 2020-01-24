@@ -301,8 +301,8 @@ getCCLEP <-
 
     
     profiles <- cbind(profiles, recomputed[rownames(profiles),])
-    print("structure of profiles")
-    print(str(profiles))
+    print("colnames of profiles")
+    print(colnames(profiles))
     profiles[,"AAC"] <- as.numeric(profiles[,"AAC"])
     profiles[,"IC50"] <- as.numeric(profiles[,"IC50"])
     profiles[,"HS"] <- as.numeric(profiles[,"HS"])
