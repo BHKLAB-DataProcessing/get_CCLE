@@ -311,6 +311,7 @@ getCCLEP <-
     
     #profiles <- cbind(profiles, "amax_recomputed"= Amax)    
     profiles$AAC <- profiles$AAC/100
+    print(colnames(profiles))
     colnames(profiles) <- c("ic50_published","aac_published","amax_published","aac_recomputed","ic50_recomputed","HS","E_inf","EC50")
 	  
     print("Profiles done")
