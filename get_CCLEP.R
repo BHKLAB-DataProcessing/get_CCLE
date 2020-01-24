@@ -27,14 +27,14 @@ getCCLEP <-
     RNAseqFolder <- "download_ccle_molec/CCLE_molecular/CCLE_molecular/2015/RNA-seq"
     processed_folder <- "CCLE_Kallisto_0.43.1_hg38_gen23"
     toolver ="kallisto"
-    annotate="/pfs/getCCLE/Gencode.v23.annotation.RData"	    
+    annotate="/pfs/get_CCLE/Gencode.v23.annotation.RData"	    
 	    
   
     }, rna2 = {
     RNAseqFolder <- "download_gray_molec/GRAY_molecular/GRAY_molecular/2017/RNA-seq"
     processed_folder <- "CCLE_Kallisto_0.46.1_hg38_gen23"
     toolver ="kallisto"
-    annotate="/pfs/getCCLE/Gencode.v23.annotation.RData"
+    annotate="/pfs/get_CCLE/Gencode.v23.annotation.RData"
     })
     
     print(RNAseqFolder)
@@ -50,7 +50,7 @@ getCCLEP <-
     badchars <- "[\xb5]|[]|[ ,]|[;]|[:]|[-]|[+]|[*]|[%]|[$]|[#]|[{]|[}]|[[]|[]]|[|]|[\\^]|[/]|[\\]|[.]|[_]|[ ]"
     ## drug information
     message("Read drug information")
-    druginfo <- read.csv("/pfs/getCCLE/CCLE_NP24.2009_profiling_2012.02.20.csv", stringsAsFactors=FALSE)
+    druginfo <- read.csv("/pfs/get_CCLE/CCLE_NP24.2009_profiling_2012.02.20.csv", stringsAsFactors=FALSE)
     druginfo[druginfo == "" | druginfo == " "] <- NA
     
     ##########################################################################
@@ -71,7 +71,7 @@ getCCLEP <-
     
     
     #      drugpheno <- gdata::read.xls(xls=file.path(path.drug, "ccle_drug_pheno_file.xls"), sheet=12)
-    drugpheno <- read.csv("/pfs/getCCLE/CCLE_NP24.2009_Drug_data_2015.02.24.csv")
+    drugpheno <- read.csv("/pfs/get_CCLE/CCLE_NP24.2009_Drug_data_2015.02.24.csv")
     drugpheno[drugpheno == "" | drugpheno == " "] <- NA
     drugpheno[drugpheno[ , "Compound"]=="ZD-6474", "Compound"] <- "Vandetanib"
     drugpheno[drugpheno[ , "Compound"]=="PF2341066", "Compound"] <- "PF-2341066"
@@ -184,7 +184,7 @@ getCCLEP <-
     
     ## info about each experiment
     message("Read sample information")
-    sampleinfo <- read.csv("/pfs/getCCLE/CCLE_sample_info_file_2012-10-18.txt", sep="\t")
+    sampleinfo <- read.csv("/pfs/get_CCLE/CCLE_sample_info_file_2012-10-18.txt", sep="\t")
     sampleinfo[sampleinfo == "" | sampleinfo == " "] <- NA
     sampleinfo <- data.frame("cellid"=as.character(sampleinfo[ , "Cell.line.primary.name"]), sampleinfo, check.names=FALSE)
     ## remove duplicated cell line hybridization
@@ -424,7 +424,7 @@ getCCLEP <-
     }
     
 
-    rnaseq.sampleinfo <- read.csv("/pfs/getCCLE/ccle_rnaseq_curation.csv", stringsAsFactors=FALSE)
+    rnaseq.sampleinfo <- read.csv("/pfs/get_CCLE/ccle_rnaseq_curation.csv", stringsAsFactors=FALSE)
     rownames(rnaseq.sampleinfo) <- gsub(".bam", "",rnaseq.sampleinfo[ , "file_name"])
     rnaseq.sampleinfo <- rnaseq.sampleinfo[ ,-1]
     rnaseq.sampleinfo <- rnaseq.sampleinfo[ ,-1]
