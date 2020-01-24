@@ -303,16 +303,18 @@ getCCLEP <-
     profiles <- cbind(profiles, recomputed[rownames(profiles),])
     print("colnames of profiles")
     print(colnames(profiles))
-    profiles[,"AAC"] <- as.numeric(profiles[,"AAC"])
-    profiles[,"IC50"] <- as.numeric(profiles[,"IC50"])
-    profiles[,"HS"] <- as.numeric(profiles[,"HS"])
-    profiles[,"E_inf"] <- as.numeric(profiles[,"E_inf"])
-    profiles[,"EC50"] <- as.numeric(profiles[,"EC50"])
+    profiles <-  data.frame("ic50_published" = as.numeric(profiles[,"ic50_published"]),
+                        "aac_published" = as.numeric(profiles[,"aac_published"]),
+                        "amax_published" = as.numeric(profiles[,"amax_published"]),
+                        "aac_recomputed" = as.numeric(profiles[,"AAC"]), 
+                        "ic50_recomputed"=as.numeric(profiles[,"IC50"]), 
+                        "HS"=as.numeric(profiles[,"HS"]), 
+                        "E_inf"=as.numeric(profiles[,"E_inf"]), 
+                        "EC50"=as.numeric(profiles[,"EC50"]))
+
     
-    #profiles <- cbind(profiles, "amax_recomputed"= Amax)    
-    profiles[,"AAC"] <- profiles[,"AAC"]/100
-    print(colnames(profiles))
-    colnames(profiles) <- c("ic50_published","aac_published","amax_published","aac_recomputed","ic50_recomputed","HS","E_inf","EC50")
+    #profiles <- cbind(profiles, "amax_recomputed"= Amax)
+    profiles$aac_recomputed <- profiles$aac_recomputed/100
 	  
     print("Profiles done")
     ### Temporary solution while we wait for the release of PharmacoDb!!!
