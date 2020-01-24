@@ -303,7 +303,7 @@ getCCLEP <-
     profiles <- cbind(profiles, recomputed[rownames(profiles),])
     print("colnames of profiles")
     print(colnames(profiles))
-    profiles <-  data.frame("ic50_published" = as.numeric(profiles[,"ic50_published"]),
+    sens.profiles <-  data.frame("ic50_published" = as.numeric(profiles[,"ic50_published"]),
                         "aac_published" = as.numeric(profiles[,"aac_published"]),
                         "amax_published" = as.numeric(profiles[,"amax_published"]),
                         "aac_recomputed" = as.numeric(profiles[,"AAC"]), 
@@ -312,9 +312,11 @@ getCCLEP <-
                         "E_inf"=as.numeric(profiles[,"E_inf"]), 
                         "EC50"=as.numeric(profiles[,"EC50"]))
 
-    
     #profiles <- cbind(profiles, "amax_recomputed"= Amax)
-    profiles$aac_recomputed <- profiles$aac_recomputed/100
+    sens.profiles$aac_recomputed <- sens.profiles$aac_recomputed/100
+    rownames(sens.profiles) <- rownames(profiles)
+    profiles <- sens.profiles
+    print(head(profiles))
 	  
     print("Profiles done")
     ### Temporary solution while we wait for the release of PharmacoDb!!!
