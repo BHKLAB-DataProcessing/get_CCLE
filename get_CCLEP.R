@@ -16,6 +16,37 @@ getCCLEP <-
       })
     }
     
+    myDirPrefix <- "/pfs"
+
+    args = commandArgs(trailingOnly=TRUE)
+
+    rnaversion <- args[[1]]
+	  
+	  
+    switch(rnaversion, rna1 = {
+    RNAseqFolder <- "download_ccle_molec/CCLE_molecular/CCLE_molecular/2015/RNA-seq"
+    processed_folder <- "CCLE_Kallisto_0.43.1_hg38_gen23"
+    toolver ="kallisto"
+    annotate="/pfs/getCCLE/Gencode.v23.annotation.RData"	    
+	    
+  
+    }, rna2 = {
+    RNAseqFolder <- "download_gray_molec/GRAY_molecular/GRAY_molecular/2017/RNA-seq"
+    processed_folder <- "CCLE_Kallisto_0.46.1_hg38_gen23"
+    toolver ="kallisto"
+    annotate="/pfs/getCCLE/Gencode.v23.annotation.RData"
+    })
+    
+    print(RNAseqFolder)
+    print(processed_folder)
+    print(toolver)	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
     badchars <- "[\xb5]|[]|[ ,]|[;]|[:]|[-]|[+]|[*]|[%]|[$]|[#]|[{]|[}]|[[]|[]]|[|]|[\\^]|[/]|[\\]|[.]|[_]|[ ]"
     ## drug information
     message("Read drug information")
@@ -400,21 +431,21 @@ getCCLEP <-
     
     rnaseq.sampleinfo$cellid <- as.character(matchToIDTable(ids=rnaseq.sampleinfo$cellid, tbl=curationCell, column = "CCLE_rnaseq.cellid", returnColumn = "unique.cellid"))
    
-    rnaseq <- summarizeRnaSeq(dir="/pfs/downloadcclemolec/CCLE_Kallisto_0.43.1_processed/CCLE_Kallisto_0.43.1_processed", 
+    rnaseq <- summarizeRnaSeq(dir=paste0(file.path(myDirPrefix, RNAseqFolder, processed_folder)), 
                                 tool="kallisto", 
-                                features_annotation="/pfs/getCCLE/Gencode.v23.annotation.RData",
+                                features_annotation= annotate,
                                 samples_annotation=rnaseq.sampleinfo)
     
     
     
     #rna
     
-    load("/pfs/downloadcclemolec/ccle_rna.RData")
+    load("/pfs/download_ccle_molec/CCLE_molecular/CCLE_molecular/2015/RNA/ccle_rna.RData")
     rna$cellid <- matchToIDTable(ids=rna$Cell.line.primary.name, tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid")
  
     
     #cnv
-    ttt <- readRDS("/pfs/downloadcclemolec/CCLE_CN.gene.RDS")
+    ttt <- readRDS("/pfs/download_ccle_molec/CCLE_molecular/CCLE_molecular/2015/CNV/CCLE_CN.gene.RDS")
     ccle.eset <- ttt
     ccle.eset <- ccle.eset[ , which(!is.na(pData(ccle.eset)[, "Cell line primary name"]))]
     tt <- rownames(pData(ccle.eset))
@@ -441,7 +472,7 @@ getCCLEP <-
     #mutation
     
     ## from hybrid capture
-  mut <- read.csv("/pfs/downloadcclemolec/CCLE_hybrid_capture1650_hg19_NoCommonSNPs_NoNeutralVariants_CDS_2012.05.07.maf", sep="\t")
+  mut <- read.csv("/pfs/download_ccle_molec/CCLE_molecular/CCLE_molecular/2015/Mutation/CCLE_hybrid_capture1650_hg19_NoCommonSNPs_NoNeutralVariants_CDS_2012.05.07.maf", sep="\t")
   mut <- mut[ , c("Hugo_Symbol", "Tumor_Sample_Barcode", "Protein_Change"), drop=FALSE]
   mut[!is.na(mut) & mut == ""] <- NA
   mut[is.na(mut[ , "Protein_Change"]) | mut[ , "Protein_Change"] == "", "Protein_Change"] <- "wt"
@@ -450,7 +481,7 @@ getCCLEP <-
   myx <- !duplicated(paste(mut[ , c("Tumor_Sample_Barcode")], mut[ , c("Hugo_Symbol")], mut[ , c("Protein_Change")], sep="///"))
   mut <- mut[myx, , drop=FALSE]
   ## from oncomap
-  mut2 <- read.csv("/pfs/downloadcclemolec/CCLE_Oncomap3_2012-04-09.maf", sep="\t")
+  mut2 <- read.csv("/pfs/download_ccle_molec/CCLE_molecular/CCLE_molecular/2015/Mutation/CCLE_Oncomap3_2012-04-09.maf", sep="\t")
   mut2 <- mut2[ , c("Hugo_Symbol", "Tumor_Sample_Barcode", "Protein_Change"), drop=FALSE]
   mut2[!is.na(mut2) & mut2 == ""] <- NA
   # mut2[is.na(mut2[ , "Protein_Change"]) | mut2[ , "Protein_Change"] == "", "Protein_Change"] <- "wt"
