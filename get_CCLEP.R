@@ -579,7 +579,11 @@ cellsPresent <- sort(unionList(sensitivityInfo$cellid,
 				ccle.eset$cellid,
 		    		rnaseq$rnaseq$cellid))
     
-celline.ccle <- celline.ccle[cellsPresent,]    
+celline.ccle <- celline.ccle[cellsPresent,]
+
+#add cellosaurus disease type to cell-info
+disease <- cell_all$Cellosaurus.Disease.Type[match(celline.ccle$cellid, cell_all$unique.cellid)]
+celline.ccle$Cellosaurus.Disease.Type <- disease
 	  
 	  
 drugsPresent <- sort(unique(sensitivityInfo$drugid))
