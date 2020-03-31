@@ -446,9 +446,9 @@ library(Biobase)
     
     
     
-    #rna
-    
-    load("/pfs/download_ccle_molec/CCLE_molecular/CCLE_molecular/2015/RNA/ccle_rna.RData")
+    #microarray (rna)
+    load("/pfs/processCCLE_Brain-Array/ccle_ge_brainarray_rma.RData")
+    rna <- eset
     rna$cellid <- matchToIDTable(ids=rna$Cell.line.primary.name, tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid")
  
     
