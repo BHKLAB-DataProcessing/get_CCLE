@@ -585,7 +585,28 @@ celline.ccle <- celline.ccle[cellsPresent,]
 disease <- cell_all$Cellosaurus.Disease.Type[match(celline.ccle$cellid, cell_all$unique.cellid)]
 celline.ccle$Cellosaurus.Disease.Type <- disease
 	  
-	  
+
+#add cellosaurus assession to cell-info
+assession <- cell_all$Cellosaurus.Accession.id[match(celline.ccle$cellid, cell_all$unique.cellid)]
+celline.ccle$Cellosaurus.Accession.id <- assession
+		 
+#add pharmacodb id to cell-info
+pdb <- cell_all$PharmacoDB.id[match(celline.ccle$cellid, cell_all$unique.cellid)]
+celline.ccle$PharmacoDB.id <- pdb
+
+#add study tissue id to cell_info
+study_tissue <- cell_all$unique.tissueid.fromstudies[match(celline.ccle$cellid, cell_all$unique.cellid)]
+celline.ccle$unique.tissueid.fromstudies <- study_tissue
+		 
+#add study cell-line type to cell_info
+cell_type <- cell_all$CellLine.Type[match(celline.ccle$cellid, cell_all$unique.cellid)]
+celline.ccle$CellLine.Type <- cell_type
+		 
+#add metastatic info to cell_info		 
+metastatic <- cell_all$Metastatic[match(celline.ccle$cellid, cell_all$unique.cellid)]
+celline.ccle$Metastatic <- metastatic
+
+
 drugsPresent <- sort(unique(sensitivityInfo$drugid))
 
 druginfo <- druginfo[drugsPresent,]
@@ -709,7 +730,7 @@ sensitivityInfo <- as.data.frame(sensitivityInfo)
 standardize <- standardizeRawDataConcRange(sens.info = sensitivityInfo, sens.raw = raw.sensitivity)
        
     
-    CCLE <- PharmacoSet(molecularProfiles=z, name="CCLE", cell=celline.ccle, drug=druginfo, sensitivityInfo=standardize$sens.info, sensitivityRaw=standardize$sens.raw, sensitivityProfiles=profiles, sensitivityN=NULL,  curationCell=curationCell, curationDrug=curationDrug, curationTissue=curationTissue, datasetType="sensitivity")
+CCLE <- PharmacoSet(molecularProfiles=z, name="CCLE", cell=celline.ccle, drug=druginfo, sensitivityInfo=standardize$sens.info, sensitivityRaw=standardize$sens.raw, sensitivityProfiles=profiles, sensitivityN=NULL,  curationCell=curationCell, curationDrug=curationDrug, curationTissue=curationTissue, datasetType="sensitivity")
 
 filterNoisyCurves2 <- function(pSet, epsilon=25 , positive.cutoff.percent=.80, mean.viablity=200, nthread=1) {
 acceptable <- mclapply(rownames(sensitivityInfo(pSet)), function(xp) {
