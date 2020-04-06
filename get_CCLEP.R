@@ -557,7 +557,7 @@ library(Biobase)
     
   #add missing celllines and drugs to cell/drug info
     
-  cellnall <- unionList(rownames(celline.ccle), 
+cellnall <- unionList(rownames(celline.ccle), 
 			ccle.eset$cellid, 
 		        rna$cellid, 
 		        rnaseq$rnaseq$cellid,
@@ -572,7 +572,7 @@ colnames(newRows) <- colnames(celline.ccle)
 newRows[,"unique.cellid"] <- newcells
 
 celline.ccle <- rbind(celline.ccle, newRows)
-    
+
 cellsPresent <- sort(unionList(sensitivityInfo$cellid, 
 				rna$cellid, 
 				MutationEset$cellid,
@@ -580,6 +580,12 @@ cellsPresent <- sort(unionList(sensitivityInfo$cellid,
 		    		rnaseq$rnaseq$cellid))
     
 celline.ccle <- celline.ccle[cellsPresent,]
+
+celline.ccle$tissueid <- curationTissue[rownames(celline.ccle), "unique.tissueid"]
+celline.ccle$cellid <- rownames(celline.ccle)
+
+curationTissue <- curationTissue[rownames(celline.ccle),]
+curationCell <- curationCell[rownames(celline.ccle),]
 
 #add cellosaurus disease type to cell-info
 disease <- cell_all$Cellosaurus.Disease.Type[match(celline.ccle$cellid, cell_all$unique.cellid)]
