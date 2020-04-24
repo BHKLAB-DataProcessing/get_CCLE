@@ -1,3 +1,4 @@
+head(list.files("/pfs/ccle_rnaseq_kallisto_0_46_1"))
 
 library(PharmacoGx)
 library(genefu)
@@ -7,7 +8,7 @@ library(Biobase)
 
 options(stringsAsFactors = FALSE)
 
-    
+
     matchToIDTable <- function(ids,tbl, column, returnColumn="unique.cellid") {
       sapply(ids, function(x) {
         myx <- grep(paste0("((///)|^)",Hmisc::escapeRegex(x),"((///)|$)"), tbl[,column])
