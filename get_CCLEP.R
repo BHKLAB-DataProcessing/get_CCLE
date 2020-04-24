@@ -461,7 +461,7 @@ print(tool_path)
 
     rnaseq.sampleinfo <- read.csv(file="/pfs/downAnnotations/ccle_rnaseq_meta.csv", stringsAsFactors=FALSE)
     rownames(rnaseq.sampleinfo) <- rnaseq.sampleinfo$Run
-    rnaseq.sampleinfo[ , "cellid"] <- as.character(matchToIDTable(ids=rnaseq.sampleinfo[ , "Cell_Line"], tbl=curationCell, column = "CCLE_rnaseq.cellid", returnColumn = "unique.cellid"))
+    rnaseq.sampleinfo[ , "cellid"] <- as.character(matchToIDTable(ids=rnaseq.sampleinfo[ , "Cell_Line"], tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid"))
    
     for (r in 1:length(tool_path)){
   print(tool_path[r])
@@ -681,6 +681,7 @@ rownames(drug_all) <- drug_all[ , "unique.drugid"]
 drug_all <- drug_all[rownames(druginfo),]
 druginfo[,c("smiles","inchikey","cid","FDA")] <- drug_all[,c("smiles","inchikey","cid","FDA")]
     
+curationDrug <- curationDrug[rownames(druginfo),]
 
 standardizeRawDataConcRange <- function(sens.info, sens.raw){
 	unq.drugs <- unique(sens.info$drugid)
