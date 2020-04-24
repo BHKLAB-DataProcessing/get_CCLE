@@ -483,11 +483,9 @@ print(tool_path)
   } else {
     annot = "/pfs/downAnnotations/Ensembl.v99.annotation.RData"
   }
-    print(annot)
+  print(annot)
   
   print(tdir)
-  print("tool path")
-  print(tool_path[r])
   print(file.path(paste0(myDirPrefix, tdir, tool_path[r])))
   rnaseq <- summarizeRnaSeq(dir=file.path(paste0(myDirPrefix, tdir, tool_path[r])),
                             features_annotation=annot,
@@ -499,6 +497,8 @@ print(tool_path)
   )
 }
     
+print("finished rnaseq summarization")
+
 rnaseq_cellid_all <- pData(rnaseq_results[[1]])[,"cellid"]
     
     #microarray (rna)
