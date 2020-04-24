@@ -460,7 +460,7 @@ print(tool_path)
     
 
     rnaseq.sampleinfo <- read.csv(file="/pfs/downAnnotations/ccle_rnaseq_meta.csv", stringsAsFactors=FALSE)
-    
+    rownames(rnaseq.sampleinfo) <- rnaseq.sampleinfo$Run
     rnaseq.sampleinfo[ , "cellid"] <- as.character(matchToIDTable(ids=rnaseq.sampleinfo[ , "Cell_Line"], tbl=curationCell, column = "CCLE_rnaseq.cellid", returnColumn = "unique.cellid"))
    
     for (r in 1:length(tool_path)){
@@ -488,6 +488,7 @@ print(tool_path)
   print(tdir)
   print("tool path")
   print(tool_path[r])
+  print(file.path(paste0(myDirPrefix, tdir, tool_path[r])))
   rnaseq <- summarizeRnaSeq(dir=file.path(paste0(myDirPrefix, tdir, tool_path[r])),
                             features_annotation=annot,
                             samples_annotation=rnaseq.sampleinfo,
