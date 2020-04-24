@@ -687,6 +687,7 @@ drug_all <- drug_all[rownames(druginfo),]
 druginfo[,c("smiles","inchikey","cid","FDA")] <- drug_all[,c("smiles","inchikey","cid","FDA")]
     
 curationDrug <- curationDrug[rownames(druginfo),]
+druginfo$drugid <- rownames(druginfo)
 
 standardizeRawDataConcRange <- function(sens.info, sens.raw){
 	unq.drugs <- unique(sens.info$drugid)
