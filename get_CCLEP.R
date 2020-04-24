@@ -485,6 +485,8 @@ print(tool_path)
     print(annot)
   
   print(tdir)
+  print("tool path")
+  print(tool_path[r])
   rnaseq <- summarizeRnaSeq(dir=file.path(paste0(myDirPrefix, tdir, tool_path[r])),
                             features_annotation=annot,
                             samples_annotation=rnaseq.sampleinfo,
