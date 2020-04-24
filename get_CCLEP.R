@@ -451,6 +451,11 @@ print(tool_path)
   pData(transcript.count) <- samples_annotation[sampleNames(transcript.count),]
   annotation(transcript.count) <- "isoforms"
   
+  pData(gene.exp)[ ,"batchid"] <- NA
+  pData(gene.count)[ ,"batchid"] <- NA	  
+  pData(transcript.exp)[ ,"batchid"] <- NA
+  pData(transcript.count)[ ,"batchid"] <- NA
+	    
   return(list("rnaseq"=gene.exp, 
               "rnaseq.counts"=gene.count, 
               "isoforms"=transcript.exp, 
