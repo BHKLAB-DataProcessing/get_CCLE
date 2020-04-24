@@ -20,7 +20,7 @@ options(stringsAsFactors = FALSE)
       })
     }
     
-    myDirPrefix <- "/pfs"
+myDirPrefix <- "/pfs/"
 
 
 args = commandArgs(trailingOnly=TRUE)
