@@ -1,5 +1,3 @@
-head(list.files("/pfs/ccle_rnaseq_kallisto_0_46_1"))
-
 library(PharmacoGx)
 library(genefu)
 library(data.table)
@@ -370,6 +368,9 @@ print(tool_path)
     ##update tissueid to be unique tissueid
     celline.ccle[ , "tissueid"] <- curationTissue[rownames(celline.ccle), "unique.tissueid"]
 
+    load("/pfs/downAnnotations/Ensembl.v99.annotation.RData")
+    geneMap <- features_gene
+
     summarizeRnaSeq <- function (dir, 
                              features_annotation,
                              samples_annotation,
@@ -521,10 +522,9 @@ rnaseq_cellid_all <- pData(rnaseq_results[[1]])[,"cellid"]
     rownames(pData(ccle.eset)) <- tt
     pData(ccle.eset)[ , "cellid"] <- as.character(matchToIDTable(ids=pData(ccle.eset)[, "Cell line primary name"], tbl=cell_all, column = "CCLE.cellid", returnColumn = "unique.cellid"))
     pData(ccle.eset)[,"batchid"] <- NA
-    annot <- read.csv("/pfs/downAnnotations/annot_ensembl_all_genes.csv", stringsAsFactors=FALSE, check.names=FALSE, header=TRUE, row.names=1)
-    tt <- annot[match(rownames(fData(ccle.eset)), annot$gene_name), c("gene_id", "EntrezGene.ID", "gene_name", "gene_biotype")]
+    tt <- geneMap[match(rownames(fData(ccle.eset)), geneMap$gene_name), c("gene_id", "gene_name", "gene_biotype")]
     rownames(tt) <- rownames(fData(ccle.eset))
-    colnames(tt) <- c("EnsemblGeneId", "EntrezGeneId", "Symbol", "GeneBioType")
+    colnames(tt) <- c("EnsemblGeneId", "Symbol", "GeneBioType")
     fData(ccle.eset) <- tt
     annotation(ccle.eset) <- "cnv"
     tt <- exprs(ccle.eset)  
@@ -600,13 +600,13 @@ rnaseq_cellid_all <- pData(rnaseq_results[[1]])[,"cellid"]
   #rownames(mutation) <- as.character(matchToIDTable(ids=rownames(mutation), tbl=curationCell, column = "CCLE.cellid", returnColumn = "unique.cellid"))
   #mutation <- mutation[unique(rownames(mutation)),]
   
+
   MutationEset <- ExpressionSet(t(mutation))
-  geneMap <- read.csv("/pfs/downAnnotations/annot_ensembl_all_genes.csv", as.is=TRUE)
-  geneInfoM <- geneMap[na.omit(match(rownames(MutationEset),geneMap[ , "gene_name"]) ), c('gene_id', 'gene_biotype', 'gene_name', 'EntrezGene.ID')]
+  geneInfoM <- geneMap[na.omit(match(rownames(MutationEset),geneMap[ , "gene_name"]) ), c('gene_id', 'gene_name','gene_biotype',)]
   rownames(geneInfoM) <- geneInfoM[ , "gene_name"]
   geneInfoM <- geneInfoM[rownames(MutationEset),]
   rownames(geneInfoM) <- rownames(MutationEset)
-  colnames(geneInfoM) <- c("EnsemblGeneId", "GeneBioType", "Symbol", "EntrezGeneId")
+  colnames(geneInfoM) <- c("EnsemblGeneId", "Symbol","GeneBioType")
   fData(MutationEset) <- geneInfoM
   tttt <- data.frame(row.names=colnames(MutationEset), colnames(MutationEset))
   colnames(tttt) <- 'cellid'
