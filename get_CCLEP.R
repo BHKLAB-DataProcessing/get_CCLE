@@ -602,7 +602,7 @@ rnaseq_cellid_all <- pData(rnaseq_results[[1]])[,"cellid"]
   
 
   MutationEset <- ExpressionSet(t(mutation))
-  geneInfoM <- geneMap[na.omit(match(rownames(MutationEset),geneMap[ , "gene_name"]) ), c('gene_id', 'gene_name','gene_biotype',)]
+  geneInfoM <- geneMap[na.omit(match(rownames(MutationEset),geneMap[ , "gene_name"]) ), c('gene_id', 'gene_name','gene_biotype')]
   rownames(geneInfoM) <- geneInfoM[ , "gene_name"]
   geneInfoM <- geneInfoM[rownames(MutationEset),]
   rownames(geneInfoM) <- rownames(MutationEset)
