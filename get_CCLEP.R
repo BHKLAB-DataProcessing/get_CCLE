@@ -852,5 +852,10 @@ noisy_out <- filterNoisyCurves2(CCLE)
 print("filter done")
 CCLE@sensitivity$profiles[noisy_out$noisy, ] <- NA		 
 saveRDS(CCLE, file="/pfs/out/CCLE.rds")		 
-		 
+dataset <- "CCLE"		 
+#output ORCESTRA_ID and Pachyderm commit id
+write.table(dataset, file="/pfs/out/dataset.txt", row.names = F ,quote = F, sep = "\t", col.names = F)
+write.table(ORCESTRA_ID, file="/pfs/out/orcestra_id.txt", row.names = F ,quote = F, sep = "\t", col.names = F)				   
+pach_commit_id <- Sys.getenv("PACH_OUTPUT_COMMIT_ID")
+write.table(pach_commit_id, file="/pfs/out/commit_id.txt", row.names = F ,quote = F, sep = "\t", col.names = F) 		 
 
