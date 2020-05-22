@@ -3,6 +3,8 @@ library(genefu)
 library(data.table)
 library(reshape2)
 library(Biobase)
+library(CoreGx)
+library(SummarizedExperiment)
 
 options(stringsAsFactors = FALSE)
 
@@ -617,7 +619,7 @@ rnaseq_cellid_all <- pData(rnaseq_results[[1]])[,"cellid"]
     
   #add missing celllines and drugs to cell/drug info
     
-cellnall <- unionList(rownames(celline.ccle), 
+cellnall <- CoreGx::.unionList(rownames(celline.ccle), 
 			ccle.eset$cellid, 
 		        rna$cellid, 
 		        rnaseq_cellid_all,
@@ -633,7 +635,7 @@ newRows[,"unique.cellid"] <- newcells
 
 celline.ccle <- rbind(celline.ccle, newRows)
 
-cellsPresent <- sort(unionList(sensitivityInfo$cellid, 
+cellsPresent <- sort(CoreGx::.unionList(sensitivityInfo$cellid, 
 				rna$cellid, 
 				MutationEset$cellid,
 				ccle.eset$cellid,
@@ -791,11 +793,54 @@ standardizeRawDataConcRange <- function(sens.info, sens.raw){
     "cnv"=ccle.eset)
   )
     
+		 
+.converteSetToSE <- function(eSets) {
+  
+  SEfinal <- lapply(eSets,
+         function(eSet){
+             # Change rownames from probes to EnsemblGeneId for rna data type
+             if (grepl("^rna$", Biobase::annotation(eSet))) {
+               rownames(eSet) <- Biobase::fData(eSet)$EnsemblGeneId
+             }
+             
+             # Build summarized experiment from eSet
+             SE <- SummarizedExperiment::SummarizedExperiment(
+               ## TODO:: Do we want to pass an environment for better memory efficiency?
+               assays=S4Vectors::SimpleList(as.list(Biobase::assayData(eSet))
+               ),
+               # Switch rearrange columns so that IDs are first, probes second
+               rowData=S4Vectors::DataFrame(Biobase::fData(eSet),
+                                            rownames=rownames(Biobase::fData(eSet)) 
+               ),
+               colData=S4Vectors::DataFrame(Biobase::pData(eSet),
+                                            rownames=rownames(Biobase::pData(eSet))
+               ),
+               metadata=list("experimentData" = eSet@experimentData, 
+                             "annotation" = Biobase::annotation(eSet), 
+                             "protocolData" = Biobase::protocolData(eSet)
+               )
+             )
+             ## TODO:: Determine if this can be done in the SE constructor?
+             # Extract names from expression set
+             SummarizedExperiment::assayNames(SE) <- Biobase::assayDataElementNames(eSet)
+             mDataType <- Biobase::annotation(eSet)
+             eSets[[mDataType]] <- SE
+         })
+  #setNames(pSet@molecularProfiles, names(eSets))
+  return(SEfinal)
+}
+		 
+z <- .converteSetToSE(z)		 
+		 
+		 
+		 
+		 
+		 
 sensitivityInfo <- as.data.frame(sensitivityInfo)
 standardize <- standardizeRawDataConcRange(sens.info = sensitivityInfo, sens.raw = raw.sensitivity)
        
     
-CCLE <- PharmacoSet(molecularProfiles=z, name="CCLE", cell=celline.ccle, drug=druginfo, sensitivityInfo=standardize$sens.info, sensitivityRaw=standardize$sens.raw, sensitivityProfiles=profiles, sensitivityN=NULL,  curationCell=curationCell, curationDrug=curationDrug, curationTissue=curationTissue, datasetType="sensitivity")
+CCLE <- PharmacoGx::PharmacoSet(molecularProfiles=z, name="CCLE", cell=celline.ccle, drug=druginfo, sensitivityInfo=standardize$sens.info, sensitivityRaw=standardize$sens.raw, sensitivityProfiles=profiles, sensitivityN=NULL,  curationCell=curationCell, curationDrug=curationDrug, curationTissue=curationTissue, datasetType="sensitivity")
 
 filterNoisyCurves2 <- function(pSet, epsilon=25 , positive.cutoff.percent=.80, mean.viablity=200, nthread=1) {
 acceptable <- mclapply(rownames(sensitivityInfo(pSet)), function(xp) {
