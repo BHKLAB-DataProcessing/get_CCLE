@@ -1,5 +1,5 @@
 library(PharmacoGx)
-library(genefu)
+#library(genefu)
 library(data.table)
 library(reshape2)
 library(Biobase)
