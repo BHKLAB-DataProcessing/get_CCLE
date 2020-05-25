@@ -532,7 +532,10 @@ rnaseq_cellid_all <- pData(rnaseq_results[[1]])[,"cellid"]
     
     #cnv
     ttt <- readRDS("/pfs/download_ccle_molec/CCLE_molecular/CCLE_molecular/2015/CNV/CCLE_CN.gene.RDS")
-    ccle.eset <- ttt
+    y <- ExpressionSet(ttt@assayData$exprs) #remove other assays for now (nAraw, nBraw, nMajor, nMinor, TCN), as SummarizeMolecularProfiles does not support multi-assays
+    pData(y) <- ttt@phenoData@data
+    ccle.eset <- y
+
     ccle.eset <- ccle.eset[ , which(!is.na(pData(ccle.eset)[, "Cell line primary name"]))]
     tt <- rownames(pData(ccle.eset))
     pData(ccle.eset) <- as.data.frame(apply(pData(ccle.eset), MARGIN=2, as.character), stringsAsFactors=FALSE)
