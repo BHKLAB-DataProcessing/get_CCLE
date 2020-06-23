@@ -913,7 +913,9 @@ return(list("noisy"=noisy, "ok"=acceptable))
 		 
 noisy_out <- filterNoisyCurves2(CCLE)
 print("filter done")
-CCLE@sensitivity$profiles[noisy_out$noisy, ] <- NA		 
+CCLE@sensitivity$profiles[noisy_out$noisy, ] <- NA
+
+CCLE@annotation$version <- 2
 saveRDS(CCLE, file="/pfs/out/CCLE.rds")		 
 dataset <- "CCLE"		 
 #output ORCESTRA_ID and Pachyderm commit id
