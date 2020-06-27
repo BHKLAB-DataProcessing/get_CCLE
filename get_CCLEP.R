@@ -19,6 +19,12 @@ options(stringsAsFactors = FALSE)
         return(tbl[myx, returnColumn])
       })
     }
+
+.unionList <- function(...) {
+    args <- list(...)
+    nargs <- length(args)
+    return(unique(unlist(do.call(c, args))))
+}
     
    `setcolclass.df` <-
 function (df, colclass, factor.levels) {
@@ -637,7 +643,7 @@ rnaseq_cellid_all <- pData(rnaseq_results[[1]])[,"cellid"]
     
   #add missing celllines and drugs to cell/drug info
     
-cellnall <- CoreGx:::.unionList(rownames(celline.ccle), 
+cellnall <- .unionList(rownames(celline.ccle), 
 			ccle.eset$cellid, 
 		        rna$cellid, 
 		        rnaseq_cellid_all,
@@ -653,7 +659,7 @@ newRows[,"unique.cellid"] <- newcells
 
 celline.ccle <- rbind(celline.ccle, newRows)
 
-cellsPresent <- sort(CoreGx:::.unionList(sensitivityInfo$cellid, 
+cellsPresent <- sort(.unionList(sensitivityInfo$cellid, 
 				rna$cellid, 
 				MutationEset$cellid,
 				ccle.eset$cellid,
