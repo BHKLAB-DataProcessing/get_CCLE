@@ -50,7 +50,10 @@ print(rnaseq_select)
 rnaseq_results <- list()
 ORCESTRA_ID = tail(rnaseq_select, n=1)
 
-	  
+cnv_select <-  grep('cnv', rnaseq_select)
+mutation_select <-  grep('mutation', rnaseq_select)
+microarray_select <-  grep('microarray', rnaseq_select)
+
 tools <- grep(pattern = 'Kallisto|Salmon', x = rnaseq_select)
 tools <- rnaseq_select[tools]
 tools <- gsub("-", "_", tools)
@@ -805,9 +808,48 @@ standardizeRawDataConcRange <- function(sens.info, sens.raw){
     return(list("sens.info" = sens.info, sens.raw = sens.raw))
 }
 		 
-
-    
-    
+if (length(cnv_select) > 0){
+  cnv_cells_id <- ccle.eset$cellid
+} else {
+  cnv_cells_id <- c()
+  ccle.eset <- ExpressionSet()
+  pData(ccle.eset)$cellid <- character()
+  pData(ccle.eset)$batchid <- character()
+  fData(ccle.eset)$BEST <- vector()
+  fData(ccle.eset)$Symbol <- character()
+  annotation(ccle.eset) <- "CNV data was not selected for on ORCESTRA"
+}
+		 
+if (length(mutation_select) > 0){
+  mutation_cells_id <- MutationEset$cellid
+} else {
+  mutation_cells_id <- c()
+  MutationEset <-  ExpressionSet()
+  pData(MutationEset)$cellid <- character()
+  pData(MutationEset)$batchid <- character()
+  fData(MutationEset)$BEST <- vector()
+  fData(MutationEset)$Symbol <- character()
+  annotation(MutationEset) <- "Mutation data was not selected for on ORCESTRA"
+}
+		 
+if (length(microarray_select) > 0){
+  microarray_cells_id <- rna$cellid
+} else {
+  microarray_cells_id <- c()
+  rna <- ExpressionSet()
+  pData(rna)$cellid <- character()
+  pData(rna)$batchid <- character()
+  fData(rna)$BEST <- vector()
+  fData(rna)$Symbol <- character()
+  annotation(rna) <- "Microarray data was not selected for on ORCESTRA"
+}
+		 
+cells_keep <- unique(c(rnaseq_cellid_all, sensitivityInfo$cellid, cnv_cells_id, mutation_cells_id, microarray_cells_id))
+		 
+celline.ccle <- celline.ccle[cells_keep,]
+curationCell <- curationCell[cells_keep,]
+curationTissue <- curationTissue[cells_keep,]
+		 
   z <- list()
   
   z <- c(z,c(
