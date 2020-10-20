@@ -8,6 +8,30 @@ library(SummarizedExperiment)
 
 options(stringsAsFactors = FALSE)
 
+
+myDirPrefix <- "/pfs/"
+
+
+args = commandArgs(trailingOnly=TRUE)
+rnaseq_select <- args
+print(rnaseq_select)
+rnaseq_results <- list()
+ORCESTRA_ID = tail(rnaseq_select, n=1)
+
+cnv_select <-  grep('cnv', rnaseq_select)
+mutation_select <-  grep('mutation', rnaseq_select)
+microarray_select <-  grep('microarray', rnaseq_select)
+
+tools <- grep(pattern = 'Kallisto|Salmon', x = rnaseq_select)
+tools <- rnaseq_select[tools]
+tools <- gsub("-", "_", tools)
+transcriptome <- grep(pattern = 'Gencode|Ensembl', x = rnaseq_select)
+transcriptome <- rnaseq_select[transcriptome]
+tool_path = expand.grid(a = tools,b = transcriptome)
+tool_path = paste0(tool_path$a, "_",tool_path$b)
+	  
+print(tool_path)	  
+	  
 standardize <- args[grep("filtered", args)]
 
 standardizeRawDataConcRange <- function(sens.info, sens.raw){
@@ -187,30 +211,6 @@ function (df, colclass, factor.levels) {
 	}
 	return(df)
 }
-
-myDirPrefix <- "/pfs/"
-
-
-args = commandArgs(trailingOnly=TRUE)
-rnaseq_select <- args
-print(rnaseq_select)
-rnaseq_results <- list()
-ORCESTRA_ID = tail(rnaseq_select, n=1)
-
-cnv_select <-  grep('cnv', rnaseq_select)
-mutation_select <-  grep('mutation', rnaseq_select)
-microarray_select <-  grep('microarray', rnaseq_select)
-
-tools <- grep(pattern = 'Kallisto|Salmon', x = rnaseq_select)
-tools <- rnaseq_select[tools]
-tools <- gsub("-", "_", tools)
-transcriptome <- grep(pattern = 'Gencode|Ensembl', x = rnaseq_select)
-transcriptome <- rnaseq_select[transcriptome]
-tool_path = expand.grid(a = tools,b = transcriptome)
-tool_path = paste0(tool_path$a, "_",tool_path$b)
-	  
-print(tool_path)	  
-	  
 	  
 	  
 	  
