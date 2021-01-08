@@ -961,9 +961,9 @@ sensitivityInfo <- as.data.frame(sensitivityInfo)
 	     
 if (length(standardize) > 0){
 
- standardize <- standardizeRawDataConcRange(sens.info = sensitivityInfo, sens.raw = raw.sensitivity)
- sensitivityInfo <- standardize$sens.info
- raw.sensitivity <- standardize$sens.raw
+# standardize <- standardizeRawDataConcRange(sens.info = sensitivityInfo, sens.raw = raw.sensitivity)
+# sensitivityInfo <- standardize$sens.info
+# raw.sensitivity <- standardize$sens.raw
 
 } else {
 print("unfiltered PSet")
