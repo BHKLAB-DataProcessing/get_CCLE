@@ -5,6 +5,7 @@ library(reshape2)
 library(Biobase)
 library(CoreGx)
 library(SummarizedExperiment)
+library(biocompute)
 
 options(stringsAsFactors = FALSE)
 
